@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto 1</title>
+    <link rel="stylesheet" href="interfaz/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.1/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.1/theme/dracula.min.css">
+</head>
+<body>
+    <div class="editor-container">
+        <div class="header">  
+            <button id="clearButton"><span class="material-symbols-outlined">new_window</span></button>
+            <button id="openButton"><span class="material-symbols-outlined">upload</span></button>
+
+            <button id="saveButton"><span class="material-symbols-outlined">save</span></button>
+
+            <div class="errores">
+                <div class="dropdown">
+                    <button class="dropbtn"><span class="material-symbols-outlined">sd_card_alert</span>Reportes</button>
+                    <div class="dropdown-content">
+                        <button id="erroresButton"><span class="material-symbols-outlined">error</span>Errores</button>
+                        <button id="simbolosButton"><span class="material-symbols-outlined">table</span>Tabla de Símbolos</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="runButton"><span class="material-symbols-outlined">play_arrow</span></button>
+        </div>
+        <div class="main">
+            <div class="editor">  
+                <h3 id="textEditor">Code Input</h3>
+                <textarea id="codeInput"></textarea>
+            </div>
+            <div class="console">
+                <h3 id="textConsole">Console</h3>
+                <textarea id="consoleOutput"></textarea>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.1/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.1/mode/clike/clike.min.js"></script>
+    <script src="interfaz/script.js"></script>
+</body>
+</html>
