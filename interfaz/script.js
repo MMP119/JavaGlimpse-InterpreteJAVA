@@ -1,3 +1,5 @@
+import { parse } from '../analizador/analizador.js';
+
 // Inicializa CodeMirror en el textarea con id 'codeInput'
 var editor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
     lineNumbers: true,
@@ -33,10 +35,12 @@ document.getElementById('openButton').addEventListener('click', function() {
 
 
 // función para el botón 'Run'
-document.getElementById('runButton').addEventListener('click', function() {
-    var code = editor.getValue();
+document.getElementById('runButton').addEventListener('click', () => {
+    const code = editor.getValue();
+    const result = String(parse(code)); // analizar el código
+
     // poner el código en la consola de salida
-    consoleEditor.setValue(code);
+    consoleEditor.setValue(result);
 });
 
 // función para el botón 'Clear'
