@@ -29,7 +29,7 @@ export class Entorno {
             return this.padre.getVariable(nombre);
         }
 
-        throw new Error(`Variable ${nombre} no definida`);
+        throw new Error(`Variable ${nombre} no definida`); 
     }
 
     /**

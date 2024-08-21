@@ -1,5 +1,6 @@
-import {Entorno} from '../patron/entorno.js'
-import {BaseVisitor} from '../patron/visitor.js'
+import {Entorno} from './entorno.js'
+import {BaseVisitor} from './visitor.js'
+import { Aritmetica } from '../expresiones/aritmeticas.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -20,20 +21,23 @@ export class InterpreterVisitor extends BaseVisitor {
         const izq = node.izq.accept(this);
         const der = node.der.accept(this);
 
-        switch (node.op) {
-            case '+':
-                return izq + der;
-            case '-':
-                return izq - der;
-            case '*':
-                return izq * der;
-            case '/':
-                return izq / der;
-            case '<=':
-                return izq <= der;
-            default:
-                throw new Error(`Operador no soportado: ${node.op}`);
-        }
+        const aritmetica = new Aritmetica(izq, der, node.op);
+        return aritmetica.ejecutar();
+
+        // switch (node.op) {
+        //     case '+':
+        //         return izq + der;
+        //     case '-':
+        //         return izq - der;
+        //     case '*':
+        //         return izq * der;
+        //     case '/':
+        //         return izq / der;
+        //     case '<=':
+        //         return izq <= der;
+        //     default:
+        //         throw new Error(`Operador no soportado: ${node.op}`);
+        // }
     }
 
     /**
@@ -149,4 +153,13 @@ export class InterpreterVisitor extends BaseVisitor {
             node.stmt.accept(this);
         }
     }
+
+    /**
+     * @type {BaseVisitor['visitCadena']}
+     */
+    visitCadena(node){
+        return node.valor;
+    }
+
+
 }

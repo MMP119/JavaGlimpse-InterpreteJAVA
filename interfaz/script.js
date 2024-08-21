@@ -1,5 +1,5 @@
 import { parse } from '../analizador/analizador.js';
-import { InterpreterVisitor} from '../analizador/interprete.js';
+import { InterpreterVisitor} from '../patron/interprete.js';
 
 // Inicializa CodeMirror en el textarea con id 'codeInput'
 var editor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
@@ -38,19 +38,37 @@ document.getElementById('openButton').addEventListener('click', function() {
 // función para el botón 'Run'
 document.getElementById('runButton').addEventListener('click', () => {
     const code = editor.getValue();
-    const ast = parse(code); // analizar el código
 
-    const interpretacion = new InterpreterVisitor(); // crear un visitante
+    try {
+        const ast = parse(code); // analizar el código
 
-    // Verificar si el AST es un arreglo o un solo nodo
-    if (Array.isArray(ast)) {
-        ast.forEach(nodo => nodo.accept(interpretacion));
-    } else {
-        ast.accept(interpretacion); // Si es un solo nodo
+        const interpretacion = new InterpreterVisitor(); // crear un visitante
+
+        // Verificar si el AST es un arreglo o un solo nodo
+        if (Array.isArray(ast)) {
+            ast.forEach(nodo => nodo.accept(interpretacion));
+        } else {
+            ast.accept(interpretacion); // Si es un solo nodo
+        }
+
+        // Mostrar la salida en la consola
+        consoleEditor.setValue(interpretacion.salida);
+
+    } catch (e) {
+        if (e.name === 'SyntaxError') {
+            // Mostrar el error de sintaxis en la consola
+            consoleEditor.setValue(
+                `Error de sintaxis: ${e.message}\nLínea: ${e.location.start.line}, Columna: ${e.location.start.column}`
+            );
+        } else {
+            // Manejar otros posibles errores
+            consoleEditor.setValue(
+                `Error: ${e.message}\n`+
+                `lase/Error: ${e.name}\n`+
+                `Stack: ${e.stack}`
+            );
+        }
     }
-
-    // Mostrar la salida en la consola
-    consoleEditor.setValue(interpretacion.salida);
 });
 
 // función para el botón 'Clear'
