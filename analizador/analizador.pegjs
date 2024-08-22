@@ -6,7 +6,7 @@
         'agrupacion': nodos.Agrupacion,
         'binaria': nodos.OperacionBinaria,
         'unaria': nodos.OperacionUnaria,
-        'declaracionVariable': nodos.DeclaracionVariable,
+        'declaracionTipoVariable': nodos.DeclaracionTipoVariable,
         'referenciaVariable': nodos.ReferenciaVariable,
         'print': nodos.Print,
         'expresionStmt': nodos.ExpresionStmt,
@@ -27,12 +27,14 @@
 programa = _ dcl:Declaracion* _ { return dcl }
 
 
-Declaracion = dcl:VarDcl _ { return dcl }
+Declaracion = dcl:DecVariable _ { return dcl }
 
             / stmt:Stmt _ { return stmt }
 
 
-VarDcl = "var" _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('declaracionVariable', { id, exp }) }
+DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresion _ ";" { return crearNodo('declaracionTipoVariable', { tipo, id, exp }) }
+
+            / tipo:TiposDatosPrimitivos _ id:Identificador _ ";" { const exp = null; return crearNodo('declaracionTipoVariable', { tipo, id, exp }) }
 
 
 Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
@@ -124,10 +126,6 @@ Numero = NumeroDecimal
 
 
 
-Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
-
-
-
 NumeroEntero = [0-9]+//( "." [0-9]+ )? 
     {
     const valor = parseInt(text(),10);
@@ -137,7 +135,7 @@ NumeroEntero = [0-9]+//( "." [0-9]+ )?
 
 NumeroDecimal = [0-9]+("." [0-9]+)
     {
-    const valor = text();
+    const valor = parseFloat(text(),10);
     return crearNodo('numero', { valor});
     } 
 
@@ -161,7 +159,16 @@ EscapeSequence = "\\" esc:(["\\nrt"]) {
 }
 
 
+TiposDatosPrimitivos = "int" / "float" / "string" / "boolean" / "char" / "var"  { return text() }
+
+
 // Ignorar espacios en blanco y comentarios, tanto de una línea como multilínea
 _ = ([ \t\n\r] /comentarios / comentariosMultilinea )*
+
+
+//Espresiones regulares para comentarios
 comentarios = "//" [^\n]* "\n" { return null }
 comentariosMultilinea = "/*" (!"*/" .)* "*/" { return null }
+
+// expresion para identificadores
+Identificador = [a-zA-Z_][a-zA-Z0-9_]* { return text() }

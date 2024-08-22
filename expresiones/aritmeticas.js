@@ -11,7 +11,7 @@ export class Aritmetica {
         if(typeof valor === 'string' && !String(valor).includes('.')){
             return 'string';
         }
-        if(typeof valor === 'string' && String(valor).includes('.')){
+        if(typeof valor === 'number' && String(valor).includes('.')){
             return 'float';
         }
         if(typeof valor === 'number'){

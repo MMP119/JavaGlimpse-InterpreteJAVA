@@ -1,6 +1,7 @@
 import {Entorno} from './entorno.js'
 import {BaseVisitor} from './visitor.js'
 import { Aritmetica } from '../expresiones/aritmeticas.js';
+import {DecVariables} from '../expresiones/decVariables.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -25,14 +26,6 @@ export class InterpreterVisitor extends BaseVisitor {
         return aritmetica.ejecutar();
 
         // switch (node.op) {
-        //     case '+':
-        //         return izq + der;
-        //     case '-':
-        //         return izq - der;
-        //     case '*':
-        //         return izq * der;
-        //     case '/':
-        //         return izq / der;
         //     case '<=':
         //         return izq <= der;
         //     default:
@@ -68,16 +61,33 @@ export class InterpreterVisitor extends BaseVisitor {
         return node.valor;
     }
 
+    //para las declaraciones de las variables
+    /**
+     * @type {BaseVisitor['visitDeclaracionTipoVariable']} 
+     */
+    visitDeclaracionTipoVariable(node) {
+        const nombreVariable = node.id;
+        const valorVariable = node.exp ? node.exp.accept(this): null;
+        const tipoVariable = node.tipo;
+
+        const declararVariable = new DecVariables(tipoVariable, nombreVariable, valorVariable);
+
+        const {tipo, exp} = declararVariable.asignar();
+
+        this.entornoActual.setVariable(nombreVariable, {tipo, exp});
+
+    }
+
 
     /**
      * @type {BaseVisitor['visitDeclaracionVariable']}
      */
-    visitDeclaracionVariable(node) {
-        const nombreVariable = node.id;
-        const valorVariable = node.exp.accept(this);
+    // visitDeclaracionVariable(node) {
+    //     const nombreVariable = node.id;
+    //     const valorVariable = node.exp.accept(this);
 
-        this.entornoActual.setVariable(nombreVariable, valorVariable);
-    }
+    //     this.entornoActual.setVariable(nombreVariable, valorVariable);
+    // }
 
 
     /**
@@ -85,7 +95,8 @@ export class InterpreterVisitor extends BaseVisitor {
       */
     visitReferenciaVariable(node) {
         const nombreVariable = node.id;
-        return this.entornoActual.getVariable(nombreVariable);
+        const valores = this.entornoActual.getVariable(nombreVariable);
+        return valores.exp;
     }
 
 

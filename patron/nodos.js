@@ -165,16 +165,24 @@ export class Numero extends Expresion {
     }
 }
     
-export class DeclaracionVariable extends Expresion {
+export class DeclaracionTipoVariable extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {string} options.id Identificador de la variable
+    * @param {string} options.tipo Tipo de la variable
+ * @param {string} options.id Identificador de la variable
  * @param {Expresion} options.exp Expresion de la variable
     */
-    constructor({ id, exp }) {
+    constructor({ tipo, id, exp }) {
         super();
         
+        /**
+         * Tipo de la variable
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
         /**
          * Identificador de la variable
          * @type {string}
@@ -194,7 +202,7 @@ export class DeclaracionVariable extends Expresion {
      * @param {BaseVisitor} visitor
      */
     accept(visitor) {
-        return visitor.visitDeclaracionVariable(this);
+        return visitor.visitDeclaracionTipoVariable(this);
     }
 }
     
@@ -430,4 +438,4 @@ export class Cadena extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, Cadena }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, Cadena }

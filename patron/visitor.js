@@ -16,7 +16,7 @@
  * @typedef {import('./nodos').Numero} Numero
 
 
- * @typedef {import('./nodos').DeclaracionVariable} DeclaracionVariable
+ * @typedef {import('./nodos').DeclaracionTipoVariable} DeclaracionTipoVariable
 
 
  * @typedef {import('./nodos').ReferenciaVariable} ReferenciaVariable
@@ -98,11 +98,11 @@ export class BaseVisitor {
     
 
     /**
-     * @param {DeclaracionVariable} node
+     * @param {DeclaracionTipoVariable} node
      * @returns {any}
      */
-    visitDeclaracionVariable(node) {
-        throw new Error('Metodo visitDeclaracionVariable no implementado');
+    visitDeclaracionTipoVariable(node) {
+        throw new Error('Metodo visitDeclaracionTipoVariable no implementado');
     }
     
 
