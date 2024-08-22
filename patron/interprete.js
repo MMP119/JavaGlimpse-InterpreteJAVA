@@ -22,6 +22,10 @@ export class InterpreterVisitor extends BaseVisitor {
         const izq = node.izq.accept(this);
         const der = node.der.accept(this);
 
+        console.log("izq: ",izq);
+        console.log(node.op);
+        console.log("der: ",der);
+
         const aritmetica = new Aritmetica(izq, der, node.op);
         return aritmetica.ejecutar();
 
@@ -58,8 +62,17 @@ export class InterpreterVisitor extends BaseVisitor {
       * @type {BaseVisitor['visitNumero']}
       */
     visitNumero(node) {
-        return node.valor;
+        //retornar el tipo y el valor
+        return {tipo: node.tipo, valor: node.valor};
     }
+
+    /**
+     * @type {BaseVisitor['visitCadena']}
+     */
+    visitCadena(node){
+        return {tipo: node.tipo, valor: node.valor};
+    }    
+
 
     //para las declaraciones de las variables
     /**
@@ -67,14 +80,14 @@ export class InterpreterVisitor extends BaseVisitor {
      */
     visitDeclaracionTipoVariable(node) {
         const nombreVariable = node.id;
-        const valorVariable = node.exp ? node.exp.accept(this): null;
+        const valorVariable = node.exp ? node.exp.accept(this): {tipo: node.tipo, valor: null};
         const tipoVariable = node.tipo;
 
         const declararVariable = new DecVariables(tipoVariable, nombreVariable, valorVariable);
 
-        const {tipo, exp} = declararVariable.asignar();
+        const {tipo, valor} = declararVariable.asignar();
 
-        this.entornoActual.setVariable(nombreVariable, {tipo, exp});
+        this.entornoActual.setVariable(nombreVariable, {tipo, valor});
 
     }
 
@@ -96,7 +109,7 @@ export class InterpreterVisitor extends BaseVisitor {
     visitReferenciaVariable(node) {
         const nombreVariable = node.id;
         const valores = this.entornoActual.getVariable(nombreVariable);
-        return valores.exp;
+        return valores;
     }
 
 
@@ -105,7 +118,7 @@ export class InterpreterVisitor extends BaseVisitor {
       */
     visitPrint(node) {
         const valor = node.exp.accept(this);
-        this.salida += valor + '\n';
+        this.salida += valor.valor + '\n';
     }
 
 
@@ -164,13 +177,5 @@ export class InterpreterVisitor extends BaseVisitor {
             node.stmt.accept(this);
         }
     }
-
-    /**
-     * @type {BaseVisitor['visitCadena']}
-     */
-    visitCadena(node){
-        return node.valor;
-    }
-
 
 }

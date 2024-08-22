@@ -14,28 +14,27 @@ export class DecVariables {
 
         //primero verificar si la variable viene con un tipo de dato y sin valor
         // por ejemplo int a;
-        if(this.tipo != null && this.exp == null){
+        if(this.tipo != null && this.exp.valor == null){
 
-            switch(this.tipo){
-                case 'int':
-                    var expresion = Number.parseInt(0);
-                    this.exp = expresion;
-                
-                case 'float':
-                    this.exp = 0.0;
-                
-                case 'string':
-                    this.exp = "";
-
-                case 'boolean':
-                    this.exp = true;
-
-                case 'char':
-                    this.exp = '';
-
-                default:
-                    throw new Error("Tipo de dato no soportado");
-                
+            if(this.tipo ==='int'){
+                var expresion = Number.parseInt(0);
+                this.exp = {tipo: this.tipo, valor: expresion};
+            }
+            else if(this.tipo === 'float'){
+                var expresion = Number.parseFloat(0.0);
+                this.exp = {tipo: this.tipo, valor: expresion};
+            }
+            else if(this.tipo === 'string'){
+                this.exp = {tipo: this.tipo, valor: ""};
+            }
+            else if(this.tipo === 'boolean'){
+                this.exp = {tipo: this.tipo, valor: true};
+            }
+            else if(this.tipo === 'char'){
+                this.exp = {tipo: this.tipo, valor: ''};
+            }
+            else{
+                throw new Error("Tipo de dato no soportado en variable sin expresion");
             }
 
         }
@@ -46,35 +45,36 @@ export class DecVariables {
         if(this.tipo != null && this.exp != null){
 
             switch(this.tipo){
+
                 case 'int':
-                    if(typeof this.exp === 'number' && Number.isInteger(this.exp)){
+
+                    if(this.exp.tipo === 'int'){
                         return {
                             tipo: this.tipo,
-                            exp: Number.parseInt(this.exp)
+                            valor: this.exp.valor
                         }
-                    }
-                    else{
-                        throw new Error("Tipo de dato incorrecto en la variable " + this.id +" se esperaba un entero");
+                    }else{
+                        throw new Error("Tipo de dato incorrecto en la variable " + this.id+" se esperaba un entero");
                     }
                 
                 case 'float':
-                    if(typeof this.exp === 'number' && String(this.exp).includes('.')){
-
+                    
+                    if(this.exp.tipo === 'float'){
                         return {
                             tipo: this.tipo,
-                            exp: this.exp
-                        };
+                            valor: this.exp.valor
+                        }
                     }
                     else{
                         throw new Error("Tipo de dato incorrecto en la variable " + this.id+" se esperaba un flotante");
                     }
                 
                 case 'string':
-                    if(typeof this.exp === 'string' ){
 
+                    if(this.exp.tipo === 'string'){
                         return {
                             tipo: this.tipo,
-                            exp: this.exp
+                            valor: this.exp.valor
                         }
                     }
                     else{
@@ -82,11 +82,11 @@ export class DecVariables {
                     }
 
                 case 'boolean':
-                    if(typeof this.exp === 'boolean'){
-                        // retornar  el tipo y el valor
+
+                    if(this.exp.tipo === 'boolean'){
                         return {
                             tipo: this.tipo,
-                            exp: this.exp
+                            valor: this.exp.valor
                         }
                     }
                     else{
@@ -94,11 +94,11 @@ export class DecVariables {
                     }
 
                 case 'char':
-                    if(typeof this.exp === 'string' && this.exp.length === 1){
-                        // retornar  el tipo y el valor
+
+                    if(this.exp.tipo === 'char'){
                         return {
                             tipo: this.tipo,
-                            exp: this.exp
+                            valor: this.exp.valor
                         }
                     }
                     else{
@@ -108,39 +108,44 @@ export class DecVariables {
                 // si viene con var, entonces se debe detectar el tipo de dato
                 case 'var':
 
-                    switch(typeof this.exp){
-                        case 'number':
-                            this.tipo = 'int';
-                            return this.exp;
+                    switch(this.exp.tipo){
+
+                        case 'int':
+                            return {
+                                tipo: 'int',
+                                valor: this.exp.valor
+                            }
                         
-                        case 'string' && String(this.exp).includes('.'):
-                            this.tipo = 'float';
-                            return this.exp;
+                        case 'float':
+                            return {
+                                tipo: 'float',
+                                valor: this.exp.valor
+                            }
                         
                         case 'string':
-                            this.tipo = 'string';
-                            return this.exp;
-                        
+                            return {
+                                tipo: 'string',
+                                valor: this.exp.valor
+                            }
+
                         case 'boolean':
-                            this.tipo = 'boolean';
-                            return this.exp;
+                            return {
+                                tipo: 'boolean',
+                                valor: this.exp.valor
+                            }
 
                         case 'char':
-                            this.tipo = 'char';
-                            return this.exp;
+                            return {
+                                tipo: 'char',
+                                valor: this.exp.valor
+                            }
 
                         default:
                             throw new Error("Tipo de dato no soportado");
-                        
-                    }
-
-
-                default:
-                    throw new Error("Tipo de dato no soportado");
                 
+                    }
             }
-
-        }
+        }   
 
     }
 

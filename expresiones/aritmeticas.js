@@ -6,49 +6,36 @@ export class Aritmetica {
         this.op = op;
     }
 
-    //para detectar que tipo de dato es el valor derecho e izquierdo
-    detectarTipo(valor){
-        if(typeof valor === 'string' && !String(valor).includes('.')){
-            return 'string';
-        }
-        if(typeof valor === 'number' && String(valor).includes('.')){
-            return 'float';
-        }
-        if(typeof valor === 'number'){
-            return 'int';
-        }
-    }
-
     // Método para ejecutar la operación aritmética
     ejecutar() {
 
         switch (this.op) {
             case '+':
 
-                if(this.detectarTipo(this.izq)=== 'int' && this.detectarTipo(this.der) === 'int'){
-                    const resultado = parseInt(this.izq) + parseInt(this.der);
-                    return resultado;
+                if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
+                    const resultado = parseInt(this.izq.valor) + parseInt(this.der.valor);
+                    return {tipo: 'int', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'int' && this.detectarTipo(this.der) === 'float'){
+                if(this.izq.tipo === 'int' && this.der.tipo === 'float'){
                     //pasar el valor izq y der a float y retornar dos decimales
-                    const resultado = parseFloat(this.izq) + parseFloat(this.der);
-                    return resultado
+                    const resultado = parseFloat(this.izq.valor) + parseFloat(this.der.valor);
+                    return {tipo: 'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'float'){
-                    const resultado = parseFloat(this.izq) + parseFloat(this.der);
-                    return resultado;
+                if(this.izq.tipo === 'float' && this.der.tipo === 'float'){
+                    const resultado = parseFloat(this.izq.valor) + parseFloat(this.der.valor);
+                    return {tipo: 'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'int'){
-                    const resultado = parseFloat(this.izq) + parseFloat(this.der);
-                    return resultado;
+                if(this.izq.tipo === 'float' && this.der.tipo === 'int'){
+                    const resultado = parseFloat(this.izq.valor) + parseFloat(this.der.valor);
+                    return {tipo: 'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'string' && this.detectarTipo(this.der) === 'string'){
-                    const resultado = this.izq + this.der;
-                    return resultado;
+                if(this.izq.tipo === 'string' && this.der.tipo === 'string'){
+                    const resultado = this.izq.valor + this.der.valor;
+                    return {tipo: 'string', valor: resultado};
                 }
 
                 throw new Error("Operación no soportada en la suma");
@@ -56,25 +43,25 @@ export class Aritmetica {
 
             case '-':
 
-                if(this.detectarTipo(this.izq)=== 'int' && this.detectarTipo(this.der) === 'int'){
-                    const resultado = parseInt(this.izq) - parseInt(this.der);
-                    return resultado;
+                if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
+                    const resultado = parseInt(this.izq.valor) - parseInt(this.der.valor);
+                    return {tipo: 'int', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'int' && this.detectarTipo(this.der) === 'float'){
+                if(this.izq.tipo === 'int' && this.der.tipo === 'float'){
                     //pasar el valor izq y der a float y retornar dos decimales
-                    const resultado = parseFloat(this.izq) - parseFloat(this.der);
-                    return resultado
+                    const resultado = parseFloat(this.izq.valor) - parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'float'){
-                    const resultado = parseFloat(this.izq) - parseFloat(this.der);
-                    return resultado;
+                if(this.izq.tipo === 'float' && this.der.tipo === 'float'){
+                    const resultado = parseFloat(this.izq.valor) - parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'int'){
-                    const resultado = parseFloat(this.izq) - parseFloat(this.der);
-                    return resultado;
+                if(this.izq.tipo === 'float' && this.der.tipo === 'int'){
+                    const resultado = parseFloat(this.izq.valor) - parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
                 throw new Error("Operación no soportada en la resta");
@@ -82,90 +69,90 @@ export class Aritmetica {
 
             case '*':
 
-                if(this.detectarTipo(this.izq)=== 'int' && this.detectarTipo(this.der) === 'int'){
-                    const resultado = parseInt(this.izq) * parseInt(this.der);
-                    return resultado;
+                if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
+                    const resultado = parseInt(this.izq.valor) * parseInt(this.der.valor);
+                    return {tipo:'int', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'int' && this.detectarTipo(this.der) === 'float'){
+                if(this.izq.tipo === 'int' && this.der.tipo === 'float'){
                     //pasar el valor izq y der a float y retornar dos decimales
-                    const resultado = parseFloat(this.izq) * parseFloat(this.der);
-                    return resultado
+                    const resultado = parseFloat(this.izq.valor) * parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'float'){
-                    const resultado = parseFloat(this.izq) * parseFloat(this.der);
-                    return resultado;
+                if(this.izq.tipo === 'float' && this.der.tipo === 'float'){
+                    const resultado = parseFloat(this.izq.valor) * parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'int'){
-                    const resultado = parseFloat(this.izq) * parseFloat(this.der);
-                    return resultado;
+                if(this.izq.tipo === 'float' && this.der.tipo === 'int'){
+                    const resultado = parseFloat(this.izq.valor) * parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
                 throw new Error("Operación no soportada en la multiplicación");
 
 
             case '/':
-                if(this.detectarTipo(this.izq)=== 'int' && this.detectarTipo(this.der) === 'int'){
+                if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
 
-                    if(parseInt(this.der) === 0){
+                    if(parseInt(this.der.valor) === 0){
                         new Error("No se puede dividir entre 0");
-                        return null
+                        return {tipo: null, valor: null};
                     }
 
-                    const resultado = parseInt(this.izq) / parseInt(this.der);
+                    const resultado = parseInt(this.izq.valor) / parseInt(this.der.valor);
                     //retornar sin decimales ya que son enteros
-                    return resultado.toFixed(0);
+                    return {tipo:'int', valor: resultado.toFixed(0)};
                 }
 
-                if(this.detectarTipo(this.izq) === 'int' && this.detectarTipo(this.der) === 'float'){
+                if(this.izq.tipo === 'int' && this.der.tipo === 'float'){
 
-                    if(parseFloat(this.der) === 0){
+                    if(parseFloat(this.der.valor) === 0){
                         new Error("No se puede dividir entre 0");
-                        return null
+                        return {tipo: null, valor: null};
                     }
 
                     //pasar el valor izq y der a float y retornar todos los decimales
-                    const resultado = parseFloat(this.izq) / parseFloat(this.der);
-                    return resultado;
+                    const resultado = parseFloat(this.izq.valor) / parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'float'){
+                if(this.izq.tipo === 'float' && this.der.tipo === 'float'){
 
-                    if(parseFloat(this.der) === 0){
+                    if(parseFloat(this.der.valor) === 0){
                         new Error("No se puede dividir entre 0");
-                        return null
+                        return {tipo: null, valor: null};
                     }
 
-                    const resultado = parseFloat(this.izq) / parseFloat(this.der);
-                    return resultado;
+                    const resultado = parseFloat(this.izq.valor) / parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
-                if(this.detectarTipo(this.izq) === 'float' && this.detectarTipo(this.der) === 'int'){
+                if(this.izq.tipo === 'float' && this.der.tipo === 'int'){
 
-                    if(parseInt(this.der) === 0){
+                    if(parseInt(this.der.valor) === 0){
                         new Error("No se puede dividir entre 0");
-                        return null
+                        return {tipo: null, valor: null};
                     }
 
-                    const resultado = parseFloat(this.izq) / parseFloat(this.der);
-                    return resultado;
+                    const resultado = parseFloat(this.izq.valor) / parseFloat(this.der.valor);
+                    return {tipo:'float', valor: resultado};
                 }
 
                 throw new Error("Operación no soportada en la división");
 
             case '%':
 
-                if(this.detectarTipo(this.izq)=== 'int' && this.detectarTipo(this.der) === 'int'){
+                if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
 
-                    if(parseInt(this.der) === 0){
+                    if(parseInt(this.der.valor) === 0){
                         new Error("No se puede dividir entre 0");
-                        return null
+                        return {tipo: null, valor: null};
                     }
 
-                    const resultado = parseInt(this.izq) % parseInt(this.der);
-                    return resultado;
+                    const resultado = parseInt(this.izq.valor) % parseInt(this.der.valor);
+                    return {tipo:'int', valor: resultado};
                 }
 
                 throw new Error("Operación no soportada en el módulo");                

@@ -10,14 +10,14 @@ export class Entorno {
 
     /**
      * @param {string} nombre
-     * @param {any} exp
+     * @param {any} valor
      */
-    setVariable(nombre, {tipo, exp}) {
+    setVariable(nombre, {tipo, valor}) {
         // TODO: si algo ya está definido, lanzar error
         if(this.valores.hasOwnProperty(nombre)){
             throw new Error(`Variable ${nombre} ya definida`);
         }
-        this.valores[nombre] = {tipo, exp};
+        this.valores[nombre] = {tipo, valor};
     }
 
     /**
@@ -37,18 +37,18 @@ export class Entorno {
 
     /**
    * @param {string} nombre
-   * @param {any} exp
+   * @param {any} valor
    */
-    assignVariable(nombre, exp) {
+    assignVariable(nombre, valor) {
         const valorActual = this.valores[nombre];
 
         if (valorActual) {
-            this.valores[nombre] = exp;
+            this.valores[nombre] = valor;
             return;
         }
 
         if (!valorActual && this.padre) {
-            this.padre.assignVariable(nombre, exp);
+            this.padre.assignVariable(nombre, valor);
             return;
         }
 

@@ -312,14 +312,14 @@ function peg$parse(input, options) {
   var peg$f20 = function(exp) { return crearNodo('agrupacion', { exp }) };
   var peg$f21 = function(id) { return crearNodo('referenciaVariable', { id }) };
   var peg$f22 = function() {
-    const valor = parseInt(text(),10);
-    return crearNodo('numero', { valor});
+    const valorNum = parseInt(text(),10);
+    return crearNodo('numero', { tipo:'int',valor: valorNum});
     };
   var peg$f23 = function() {
-    const valor = parseFloat(text(),10);
-    return crearNodo('numero', { valor});
+    const valorNum = parseFloat(text(),10);
+    return crearNodo('numero', { tipo:'float',valor:valorNum});
     };
-  var peg$f24 = function(chars) {return crearNodo('cadena', {valor: chars.join('')})};
+  var peg$f24 = function(chars) {return crearNodo('cadena', {tipo: 'string', valor: chars.join('')})};
   var peg$f25 = function(esc) { 
     switch (esc) {
         case 'n': return '\n';

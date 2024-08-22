@@ -128,20 +128,20 @@ Numero = NumeroDecimal
 
 NumeroEntero = [0-9]+//( "." [0-9]+ )? 
     {
-    const valor = parseInt(text(),10);
-    return crearNodo('numero', { valor});
+    const valorNum = parseInt(text(),10);
+    return crearNodo('numero', { tipo:'int',valor: valorNum});
     } 
 
 
 NumeroDecimal = [0-9]+("." [0-9]+)
     {
-    const valor = parseFloat(text(),10);
-    return crearNodo('numero', { valor});
+    const valorNum = parseFloat(text(),10);
+    return crearNodo('numero', { tipo:'float',valor:valorNum});
     } 
 
 
 // nueva regla para cadenas de texcto con secuencias de escape
-Cadena = "\"" chars: Caracteres* "\"" {return crearNodo('cadena', {valor: chars.join('')})}
+Cadena = "\"" chars: Caracteres* "\"" {return crearNodo('cadena', {tipo: 'string', valor: chars.join('')})} //el char.join es para unir los caracteres de la cadena
 
 
 Caracteres = EscapeSequence 

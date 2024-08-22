@@ -144,14 +144,22 @@ export class Numero extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {number} options.valor Valor del numero
+    * @param {string} options.tipo Tipo de dato
+ * @param {entero} options.valor Valor del numero
     */
-    constructor({ valor }) {
+    constructor({ tipo, valor }) {
         super();
         
         /**
+         * Tipo de dato
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
          * Valor del numero
-         * @type {number}
+         * @type {entero}
         */
         this.valor = valor;
 
@@ -417,11 +425,19 @@ export class Cadena extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {String} options.valor Valor de la cadena
+    * @param {string} options.tipo Tipo de dato
+ * @param {String} options.valor Valor de la cadena
     */
-    constructor({ valor }) {
+    constructor({ tipo, valor }) {
         super();
         
+        /**
+         * Tipo de dato
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
         /**
          * Valor de la cadena
          * @type {String}
