@@ -35,7 +35,7 @@ Declaracion = dcl:VarDcl _ { return dcl }
 VarDcl = "var" _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('declaracionVariable', { id, exp }) }
 
 
-Stmt = "print(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
+Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
 
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
 
@@ -49,8 +49,6 @@ Stmt = "print(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp })
     / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt { return crearNodo('while', { cond, stmt }) }
 
 
-Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
-
 
 Expresion = Asignacion
 
@@ -62,7 +60,7 @@ Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asigna
             / Cadena
 
 
-Comparacion = izq:Suma expansion:(_ op:("<=") _ der:Suma { return { tipo: op, der } })* 
+Comparacion = izq:Suma expansion:(_ op:("<" / "<=" / ">=" / ">" ) _ der:Suma { return { tipo: op, der } })* 
 { 
     return expansion.reduce(
     (operacionAnterior, operacionActual) => {
@@ -94,7 +92,7 @@ Suma = izq:Multiplicacion expansion:( _ op:("+" / "-") _ der:Multiplicacion { re
 }
 
 
-Multiplicacion = izq:Unaria expansion:(_ op:("*" / "/") _ der:Unaria { return { tipo: op, der } })* 
+Multiplicacion = izq:Unaria expansion:(_ op:("*" / "/" / "%") _ der:Unaria { return { tipo: op, der } })* 
 {
     return expansion.reduce(
         (operacionAnterior, operacionActual) => {
@@ -114,13 +112,34 @@ Unaria = "-" _ num:Numero { return crearNodo('unaria', { op: '-', exp: num }) }
 
 
 
-// { return{ tipo: "numero", valor: parseFloat(text(), 10) } }
-Numero = [0-9]+( "." [0-9]+ )? {return crearNodo('numero', { valor: parseFloat(text(), 10) })}
-
+Numero = NumeroDecimal 
+    
+    / NumeroEntero
+    
     / "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
+
+    / "[" _ exp:Expresion _ "]" { return crearNodo('agrupacion', { exp }) }
 
     / id:Identificador { return crearNodo('referenciaVariable', { id }) }
 
+
+
+Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
+
+
+
+NumeroEntero = [0-9]+//( "." [0-9]+ )? 
+    {
+    const valor = parseInt(text(),10);
+    return crearNodo('numero', { valor});
+    } 
+
+
+NumeroDecimal = [0-9]+("." [0-9]+)
+    {
+    const valor = text();
+    return crearNodo('numero', { valor});
+    } 
 
 
 // nueva regla para cadenas de texcto con secuencias de escape
