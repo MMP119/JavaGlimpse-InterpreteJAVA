@@ -173,6 +173,72 @@ export class Numero extends Expresion {
     }
 }
     
+export class Cadena extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de dato
+ * @param {String} options.valor Valor de la cadena
+    */
+    constructor({ tipo, valor }) {
+        super();
+        
+        /**
+         * Tipo de dato
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Valor de la cadena
+         * @type {String}
+        */
+        this.valor = valor;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitCadena(this);
+    }
+}
+    
+export class Booleano extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de dato
+ * @param {Boolean} options.valor Valor del booleano
+    */
+    constructor({ tipo, valor }) {
+        super();
+        
+        /**
+         * Tipo de dato
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Valor del booleano
+         * @type {Boolean}
+        */
+        this.valor = valor;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitBooleano(this);
+    }
+}
+    
 export class DeclaracionTipoVariable extends Expresion {
 
     /**
@@ -421,37 +487,4 @@ export class While extends Expresion {
     }
 }
     
-export class Cadena extends Expresion {
-
-    /**
-    * @param {Object} options
-    * @param {string} options.tipo Tipo de dato
- * @param {String} options.valor Valor de la cadena
-    */
-    constructor({ tipo, valor }) {
-        super();
-        
-        /**
-         * Tipo de dato
-         * @type {string}
-        */
-        this.tipo = tipo;
-
-
-        /**
-         * Valor de la cadena
-         * @type {String}
-        */
-        this.valor = valor;
-
-    }
-
-    /**
-     * @param {BaseVisitor} visitor
-     */
-    accept(visitor) {
-        return visitor.visitCadena(this);
-    }
-}
-    
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, Cadena }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While }

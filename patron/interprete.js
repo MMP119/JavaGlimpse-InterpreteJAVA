@@ -9,6 +9,10 @@ export class InterpreterVisitor extends BaseVisitor {
         super();
         this.entornoActual = new Entorno();
         this.salida = '';
+
+        //para los errores
+        this.errores = []; //almacenar los errores
+
     }
 
     interpretar(nodo) {
@@ -73,6 +77,13 @@ export class InterpreterVisitor extends BaseVisitor {
         return {tipo: node.tipo, valor: node.valor};
     }    
 
+    /**
+     * @type {BaseVisitor['visitBooleano']}
+     *  
+     */
+    visitBooleano(node){
+        return {tipo: node.tipo, valor: node.valor};
+    }
 
     //para las declaraciones de las variables
     /**
@@ -87,21 +98,11 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const {tipo, valor} = declararVariable.asignar();
 
+        console.log ("tipo: ", tipo, " valor: ", valor);
+
         this.entornoActual.setVariable(nombreVariable, {tipo, valor});
 
     }
-
-
-    /**
-     * @type {BaseVisitor['visitDeclaracionVariable']}
-     */
-    // visitDeclaracionVariable(node) {
-    //     const nombreVariable = node.id;
-    //     const valorVariable = node.exp.accept(this);
-
-    //     this.entornoActual.setVariable(nombreVariable, valorVariable);
-    // }
-
 
     /**
       * @type {BaseVisitor['visitReferenciaVariable']}

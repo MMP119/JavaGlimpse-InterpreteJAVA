@@ -14,13 +14,32 @@
         'bloque': nodos.Bloque,
         'if': nodos.If,
         'while': nodos.While,
-        'cadena': nodos.Cadena
+        'cadena': nodos.Cadena,
+        'booleano': nodos.Booleano
     }
 
     const nodo = new tipos[tipoNodo](props)
     nodo.location = location()
     return nodo
     }
+
+    const reservedWords = new Set([
+        'abstract', 'await', 'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class', 
+        'const', 'continue', 'debugger', 'default', 'delete', 'do', 'double', 'else', 
+        'enum', 'export', 'extends', 'false', 'final', 'finally', 'float', 'for', 'function', 
+        'goto', 'if', 'implements', 'import', 'in', 'instanceof', 'int', 'interface', 
+        'let', 'long', 'native', 'new', 'null', 'package', 'private', 'protected', 'public', 
+        'return', 'short', 'static', 'super', 'switch', 'synchronized', 'this', 'throw', 
+        'transient', 'true', 'try', 'typeof', 'var', 'void', 'volatile', 'while', 'with', 
+        'yield'
+    ]);
+
+    //funcion para verificar si un identificador es válido
+    function isValidIdentificador(id) {
+        const identificadorRegex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+        return identificadorRegex.test(id) && !reservedWords.has(id);        
+    }
+
 }
 
 
@@ -52,14 +71,13 @@ Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('pri
 
 
 
-Expresion = Asignacion
+Expresion =  Booleano
+            / Asignacion
 
 
 Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asignacion', { id, asgn }) }
             
             / Comparacion
-
-            / Cadena
 
 
 Comparacion = izq:Suma expansion:(_ op:("<" / "<=" / ">=" / ">" ) _ der:Suma { return { tipo: op, der } })* 
@@ -82,7 +100,6 @@ Comparacion = izq:Suma expansion:(_ op:("<" / "<=" / ">=" / ">" ) _ der:Suma { r
 
 Suma = izq:Multiplicacion expansion:( _ op:("+" / "-") _ der:Multiplicacion { return { tipo: op, der } })* 
 
-        // izq: Cadena expansion:( _ op:("+" / "-") _ der: Cadena { return { tipo: op, der } })*
 { 
     return expansion.reduce(
     (operacionAnterior, operacionActual) => {
@@ -107,6 +124,8 @@ Multiplicacion = izq:Unaria expansion:(_ op:("*" / "/" / "%") _ der:Unaria { ret
 
 
 Unaria = "-" _ num:Numero { return crearNodo('unaria', { op: '-', exp: num }) }
+
+    / Booleano
     
     / Numero
 
@@ -142,6 +161,11 @@ NumeroDecimal = [0-9]+("." [0-9]+)
 
 // nueva regla para cadenas de texcto con secuencias de escape
 Cadena = "\"" chars: Caracteres* "\"" {return crearNodo('cadena', {tipo: 'string', valor: chars.join('')})} //el char.join es para unir los caracteres de la cadena
+    
+        / Caracter //para cadenas de un solo caracter
+
+
+Caracter = "\'" chars: Caracteres "\'" {return crearNodo('cadena', {tipo: 'char', valor: chars})}
 
 
 Caracteres = EscapeSequence 
@@ -171,4 +195,8 @@ comentarios = "//" [^\n]* "\n" { return null }
 comentariosMultilinea = "/*" (!"*/" .)* "*/" { return null }
 
 // expresion para identificadores
-Identificador = [a-zA-Z_][a-zA-Z0-9_]* { return text() }
+Identificador = [a-zA-Z_][a-zA-Z0-9_]* { const id = text(); if(!isValidIdentificador(id)) { throw new Error(`Identificador inválido: ${id}, es una palabra reservada del lenguaje`); return null;} return id; }
+
+//expresion para los booleanos
+Booleano = "true" { return crearNodo('booleano', {tipo: 'boolean', valor: true})}
+        / "false" { return crearNodo('booleano', {tipo: 'boolean', valor: false})}
