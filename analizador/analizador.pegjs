@@ -15,7 +15,11 @@
         'if': nodos.If,
         'while': nodos.While,
         'cadena': nodos.Cadena,
-        'booleano': nodos.Booleano
+        'booleano': nodos.Booleano,
+        "for": nodos.For,
+        "break": nodos.Break,
+        "continue": nodos.Continue,
+        "return": nodos.Return,
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -58,8 +62,6 @@ DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresio
 
 Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
 
-    / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
-
     / "{" _ dcls:Declaracion* _ "}" { return crearNodo('bloque', { dcls }) }
 
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtTrue:Stmt 
@@ -69,10 +71,24 @@ Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('pri
 
     / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt { return crearNodo('while', { cond, stmt }) }
 
+    / "for" _ "(" _ init: ForInit _ cond:Expresion _ ";" _ inc:Expresion _ ")" _ stmt: Stmt {return crearNodo('for', { init, cond, inc, stmt })}
+    
+    / "break" _ ";" { return crearNodo('break') }
+
+    / "continue" _ ";" { return crearNodo('continue') }
+
+    / "return" _ exp:Expresion? _ ";" { return crearNodo('return', { exp }) }
+
+    / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
 
 
-Expresion =  Booleano
-            / Asignacion
+ForInit = dcl:Declaracion { return dcl }
+
+        / exp:Expresion _ ";"{ return exp }
+
+        / ";" { return null }
+
+Expresion = Asignacion
 
 
 Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asignacion', { id, asgn }) }
@@ -80,7 +96,7 @@ Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asigna
             / Comparacion
 
 
-Comparacion = izq:Suma expansion:(_ op:("<" / "<=" / ">=" / ">" ) _ der:Suma { return { tipo: op, der } })* 
+Comparacion = izq:Suma expansion:(_ op:("<="/ "<" / ">=" / ">" /"==") _ der:Suma { return { tipo: op, der } })* 
 { 
     return expansion.reduce(
     (operacionAnterior, operacionActual) => {
@@ -187,15 +203,15 @@ TiposDatosPrimitivos = "int" / "float" / "string" / "boolean" / "char" / "var"  
 
 
 // Ignorar espacios en blanco y comentarios, tanto de una línea como multilínea
-_ = ([ \t\n\r] /comentarios / comentariosMultilinea )*
+_ = ([ \t\n\r] / Comentarios)*
 
 
 //Espresiones regulares para comentarios
-comentarios = "//" [^\n]* "\n" { return null }
-comentariosMultilinea = "/*" (!"*/" .)* "*/" { return null }
+Comentarios = "//" (![\n] .)* 
+            / "/*"(!( "*/") .)* "*/"
 
 // expresion para identificadores
-Identificador = [a-zA-Z_][a-zA-Z0-9_]* { const id = text(); if(!isValidIdentificador(id)) { throw new Error(`Identificador inválido: ${id}, es una palabra reservada del lenguaje`); return null;} return id; }
+Identificador = [a-zA-Z_][a-zA-Z0-9_]* { const id = text(); return id;}//if(!isValidIdentificador(id)) { throw new Error(`Identificador inválido: ${id}, es una palabra reservada del lenguaje`); return null;} return id; }
 
 //expresion para los booleanos
 Booleano = "true" { return crearNodo('booleano', {tipo: 'boolean', valor: true})}

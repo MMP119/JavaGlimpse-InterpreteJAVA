@@ -1,7 +1,11 @@
 import {Entorno} from './entorno.js'
 import {BaseVisitor} from './visitor.js'
+import nodos, {Expresion} from './nodos.js';
 import { Aritmetica } from '../expresiones/aritmeticas.js';
 import {DecVariables} from '../expresiones/decVariables.js';
+import {Relacionales} from '../expresiones/relacionales.js';
+import {Logicas} from '../expresiones/logicas.js';
+import { ExcepcionBrake, ExcepcionContinue, ExcepcionReturn } from '../expresiones/transferencia.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -11,7 +15,13 @@ export class InterpreterVisitor extends BaseVisitor {
         this.salida = '';
 
         //para los errores
-        this.errores = []; //almacenar los errores
+        this.errores = []; //almacenar los errores+
+
+
+        /**
+         * @type {Expresion|null}
+         */
+        this.antesContinue = null;
 
     }
 
@@ -26,19 +36,18 @@ export class InterpreterVisitor extends BaseVisitor {
         const izq = node.izq.accept(this);
         const der = node.der.accept(this);
 
-        console.log("izq: ",izq);
-        console.log(node.op);
-        console.log("der: ",der);
-
-        const aritmetica = new Aritmetica(izq, der, node.op);
-        return aritmetica.ejecutar();
-
-        // switch (node.op) {
-        //     case '<=':
-        //         return izq <= der;
-        //     default:
-        //         throw new Error(`Operador no soportado: ${node.op}`);
-        // }
+        if (['+', '-', '*', '/', '%'].includes(node.op)) {
+            const aritmetica = new Aritmetica(izq, der, node.op);
+            return aritmetica.ejecutar();
+        } else if (['==', '!=', '<', '<=', '>', '>='].includes(node.op)) {
+            const relacionales = new Relacionales(izq, der, node.op);
+            return relacionales.ejecutar();
+        } else if (['&&', '||', '!'].includes(node.op)) {
+            const logicas = new Logicas(izq, der, node.op);
+            return logicas.ejecutar();
+        } else {
+            throw new Error(`Operador no soportado: ${node.op}`);
+        }
     }
 
     /**
@@ -98,8 +107,6 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const {tipo, valor} = declararVariable.asignar();
 
-        console.log ("tipo: ", tipo, " valor: ", valor);
-
         this.entornoActual.setVariable(nombreVariable, {tipo, valor});
 
     }
@@ -148,7 +155,13 @@ export class InterpreterVisitor extends BaseVisitor {
         const entornoAnterior = this.entornoActual;
         this.entornoActual = new Entorno(entornoAnterior);
 
-        node.dcls.forEach(dcl => dcl.accept(this));
+        node.dcls.forEach(dcl => {
+            if (dcl) {
+                dcl.accept(this);
+            } else {
+                console.error("Nodo undefined encontrado en 'dcls'");
+            }
+        });
 
         this.entornoActual = entornoAnterior;
     }
@@ -159,7 +172,7 @@ export class InterpreterVisitor extends BaseVisitor {
     visitIf(node) {
         const cond = node.cond.accept(this);
 
-        if (cond) {
+        if (cond.valor) {
             node.stmtTrue.accept(this);
             return;
         }
@@ -174,9 +187,98 @@ export class InterpreterVisitor extends BaseVisitor {
      * @type {BaseVisitor['visitWhile']}
      */
     visitWhile(node) {
-        while (node.cond.accept(this)) {
-            node.stmt.accept(this);
+        const entornoAnterior = this.entornoActual;
+
+        try{
+
+            while (node.cond.accept(this).valor) {
+                node.stmt.accept(this);
+            }
+            
+        }catch(e){
+
+            this.entornoActual = entornoAnterior;
+            if(e instanceof ExcepcionBrake){
+                return;
+            }
+
+            if(e instanceof ExcepcionContinue){
+                return this.visitWhile(node);
+            }
+
+            throw e;
+
         }
+    }
+
+    /**
+     * @type {BaseVisitor['visitFor']}
+     */
+    visitFor(node) {
+        
+        const incrementoAntes = this.antesContinue;
+        this.antesContinue = node.inc;
+    
+        const FOR = new nodos.Bloque({
+            dcls: [
+                node.init,
+                new nodos.While({
+                    cond: node.cond,
+                    stmt: new nodos.Bloque({
+                        dcls: [
+                            node.stmt,
+                            node.inc
+                        ]
+                    })
+                })
+            ]
+        });
+    
+        FOR.accept(this);
+        this.antesContinue = incrementoAntes;
+    }
+
+    /**
+     * @type {BaseVisitor['visitBreak']}
+     */
+    visitBreak(node){
+        throw new ExcepcionBrake();
+
+
+    }
+
+
+    /**
+     * @type {BaseVisitor['visitContinue']}
+     */
+    visitContinue(node){
+
+        if(this.antesContinue){
+            this.antesContinue.accept(this);
+        }
+
+        throw new ExcepcionContinue();
+    }
+
+    /**
+     * @type {BaseVisitor['visitReturn']}
+     */
+    visitReturn(node){
+
+        let valor = null
+
+        if(node.exp){
+            valor = node.exp.accept(this);
+        }
+        throw new ExcepcionReturn(valor);
+    }
+
+    /**
+     * @type {BaseVisitor['visitLlamada']}
+     */
+    visitLlamada(node){
+        
+
     }
 
 }

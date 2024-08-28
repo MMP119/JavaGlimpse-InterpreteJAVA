@@ -26,7 +26,7 @@ export class Entorno {
     getVariable(nombre) {
         const valorActual = this.valores[nombre];
 
-        if (valorActual) return valorActual;
+        if (valorActual !== undefined) return valorActual;
 
         if (!valorActual && this.padre) {
             return this.padre.getVariable(nombre);
@@ -42,7 +42,7 @@ export class Entorno {
     assignVariable(nombre, valor) {
         const valorActual = this.valores[nombre];
 
-        if (valorActual) {
+        if (valorActual !== undefined) {
             this.valores[nombre] = valor;
             return;
         }
