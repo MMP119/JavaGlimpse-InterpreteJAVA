@@ -8,7 +8,27 @@ export class DecVariables {
         this.exp = exp;
     }
 
+    //método para verificar si una variable es una palabra reservada
+    verificarReservada(node, id){
 
+        const reservedWords = new Set([
+            'abstract', 'await', 'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class', 
+            'const', 'continue', 'debugger', 'default', 'delete', 'do', 'double', 'else', 
+            'enum', 'export', 'extends', 'false', 'final', 'finally', 'float', 'for', 'function', 
+            'goto', 'if', 'implements', 'import', 'in', 'instanceof', 'int', 'interface', 
+            'let', 'long', 'native', 'new', 'null', 'package', 'private', 'protected', 'public', 
+            'return', 'short', 'static', 'super', 'switch', 'synchronized', 'this', 'throw', 
+            'transient', 'true', 'try', 'typeof', 'var', 'void', 'volatile', 'while', 'with', 
+            'yield'
+        ]);
+    
+        if(reservedWords.has(this.id)){
+            throw new Error(`La variable ${id} es una palabra reservada\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+        }
+    
+    }
+
+    
     // Método para declarar una variable
     asignar(node){
 

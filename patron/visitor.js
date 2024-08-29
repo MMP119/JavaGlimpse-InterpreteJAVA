@@ -60,6 +60,9 @@
 
  * @typedef {import('./nodos').Llamada} Llamada
 
+
+ * @typedef {import('./nodos').Ternario} Ternario
+
  */
 
 
@@ -247,6 +250,15 @@ export class BaseVisitor {
      */
     visitLlamada(node) {
         throw new Error('Metodo visitLlamada no implementado');
+    }
+    
+
+    /**
+     * @param {Ternario} node
+     * @returns {any}
+     */
+    visitTernario(node) {
+        throw new Error('Metodo visitTernario no implementado');
     }
     
 }

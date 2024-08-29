@@ -67,6 +67,13 @@ document.getElementById('runButton').addEventListener('click', () => {
             : `Error: ${e.message}`;
 
             consoleEditor.setValue(errorMessage);
+
+            consoleEditor.setValue(
+                `Error: ${e.message}\n`+
+                `lase/Error: ${e.name}\n`+
+                `Stack: ${e.stack}`
+            );
+
         }
     }
 });

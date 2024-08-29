@@ -604,7 +604,7 @@ export class Llamada extends Expresion {
     /**
     * @param {Object} options
     * @param {Expresion} options.callee Expresion a llamar
-    * @param {Expresion[]} options.args Argumentos de la llamada
+ * @param {Expresion[]} options.args Argumentos de la llamada
     */
     constructor({ callee, args }) {
         super();
@@ -632,4 +632,45 @@ export class Llamada extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Break, Continue, Return, Llamada }
+export class Ternario extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.cond Condicion del ternario
+ * @param {Expresion} options.expTrue Expresion si la condicion es verdadera
+ * @param {Expresion} options.expFalse Expresion si la condicion es falsa
+    */
+    constructor({ cond, expTrue, expFalse }) {
+        super();
+        
+        /**
+         * Condicion del ternario
+         * @type {Expresion}
+        */
+        this.cond = cond;
+
+
+        /**
+         * Expresion si la condicion es verdadera
+         * @type {Expresion}
+        */
+        this.expTrue = expTrue;
+
+
+        /**
+         * Expresion si la condicion es falsa
+         * @type {Expresion}
+        */
+        this.expFalse = expFalse;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitTernario(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Break, Continue, Return, Llamada, Ternario }

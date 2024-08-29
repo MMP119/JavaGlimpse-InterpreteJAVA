@@ -20,29 +20,13 @@
         "break": nodos.Break,
         "continue": nodos.Continue,
         "return": nodos.Return,
-        "llamada": nodos.Llamada
+        "llamada": nodos.Llamada,
+        "ternario": nodos.Ternario,
     }
 
     const nodo = new tipos[tipoNodo](props)
     nodo.location = location()
     return nodo
-    }
-
-    const reservedWords = new Set([
-        'abstract', 'await', 'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class', 
-        'const', 'continue', 'debugger', 'default', 'delete', 'do', 'double', 'else', 
-        'enum', 'export', 'extends', 'false', 'final', 'finally', 'float', 'for', 'function', 
-        'goto', 'if', 'implements', 'import', 'in', 'instanceof', 'int', 'interface', 
-        'let', 'long', 'native', 'new', 'null', 'package', 'private', 'protected', 'public', 
-        'return', 'short', 'static', 'super', 'switch', 'synchronized', 'this', 'throw', 
-        'transient', 'true', 'try', 'typeof', 'var', 'void', 'volatile', 'while', 'with', 
-        'yield'
-    ]);
-
-    //funcion para verificar si un identificador es válido
-    function isValidIdentificador(id) {
-        const identificadorRegex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
-        return identificadorRegex.test(id) && !reservedWords.has(id);        
     }
 
 }
@@ -87,14 +71,28 @@ ForInit = dcl:Declaracion { return dcl }
 
         / ";" { return null }
 
+
 Expresion = Asignacion
 
 
 Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asignacion', { id, asgn }) }
 
             / OperadorAsignacion
+
+            / Ternario
             
             / Or
+
+
+OperadorAsignacion = id: Identificador _ expansion:( _ op:("+=" / "-=") _  der:Relacionales { return { tipo: op, der } }) 
+{
+    const { tipo, der } = expansion;
+    // Identificamos el operador aritmético basado en el operador de asignación compuesta
+    const operadorAritmetico = tipo === "+=" ? "+" : "-";
+    // Creamos la expresión expandida a = a + der
+    const expresionAritmetica = crearNodo('binaria', { op: operadorAritmetico, izq: crearNodo('referenciaVariable', { id }), der });
+    return crearNodo('asignacion', { id, asgn: expresionAritmetica });
+}
 
 Or = izq:And expansion:(_ "||" _ der:And { return der })* 
 { 
@@ -110,12 +108,15 @@ Or = izq:And expansion:(_ "||" _ der:And { return der })*
 And = izq:Comparacion expansion:(_ "&&" _ der:Comparacion { return der })* 
 { 
     return expansion.reduce(
-    (operacionAnterior, operacionActual) => {
-        return crearNodo('binaria', { op:'&&', izq: operacionAnterior, der: operacionActual })
+        (operacionAnterior, operacionActual) => {
+            return crearNodo('binaria', { op:'&&', izq: operacionAnterior, der: operacionActual })
     },
     izq
     )
 }
+
+
+Ternario = cond:Comparacion _ "?" _ expTrue:Expresion _ ":" _ expFalse:Expresion { return crearNodo('ternario', { cond, expTrue, expFalse }) }
 
 
 Comparacion = izq:Relacionales expansion:(_ op:("==" / "!=") _ der:Relacionales { return { tipo: op, der } })* 
@@ -128,18 +129,6 @@ Comparacion = izq:Relacionales expansion:(_ op:("==" / "!=") _ der:Relacionales 
     izq
     )
 }
-
-
-OperadorAsignacion = id: Identificador _ expansion:( _ op:("+=" / "-=") _  der:Relacionales { return { tipo: op, der } }) 
-{
-    const { tipo, der } = expansion;
-    // Identificamos el operador aritmético basado en el operador de asignación compuesta
-    const operadorAritmetico = tipo === "+=" ? "+" : "-";
-    // Creamos la expresión expandida a = a + der
-    const expresionAritmetica = crearNodo('binaria', { op: operadorAritmetico, izq: crearNodo('referenciaVariable', { id }), der });
-    return crearNodo('asignacion', { id, asgn: expresionAritmetica });
-}
-
 
 
 Relacionales = izq:Suma expansion:(_ op:("<="/ "<" / ">=" / ">") _ der:Suma { return { tipo: op, der } })* 

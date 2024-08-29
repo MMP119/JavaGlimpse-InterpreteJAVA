@@ -121,6 +121,9 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const declararVariable = new DecVariables(tipoVariable, nombreVariable, valorVariable);
 
+        //verificar si la variable es una palabra reservada
+        declararVariable.verificarReservada(node, nombreVariable);
+
         const {tipo, valor} = declararVariable.asignar(node);
 
         this.entornoActual.setVariable(nombreVariable, {tipo, valor});
@@ -207,6 +210,7 @@ export class InterpreterVisitor extends BaseVisitor {
      * @type {BaseVisitor['visitIf']}
      */
     visitIf(node) {
+        console.log(node);
         const cond = node.cond.accept(this);
 
         if (cond.valor) {
@@ -220,6 +224,18 @@ export class InterpreterVisitor extends BaseVisitor {
 
     }
 
+    /**
+     * @type {BaseVisitor['visitTernario']}
+     */
+    visitTernario(node){
+        const cond = node.cond.accept(this);
+
+        if(cond.valor){
+            return node.expTrue.accept(this);
+        }else{
+            return node.expFalse.accept(this);
+        }
+    }
 
 
     /**
