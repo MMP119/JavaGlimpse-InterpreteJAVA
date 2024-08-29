@@ -1,13 +1,15 @@
 import {Entorno} from './entorno.js'
 import {BaseVisitor} from './visitor.js'
 import nodos, {Expresion} from './nodos.js';
-import { ExcepcionBrake, ExcepcionContinue, ExcepcionReturn } from '../expresiones/transferencia.js';
-import { Invocable } from '../expresiones/invocable.js';
-import { embebidas } from '../expresiones/embebidas.js';
-import { Aritmetica } from '../expresiones/aritmeticas.js';
+import {ExcepcionBrake, ExcepcionContinue, ExcepcionReturn} from '../expresiones/transferencia.js';
+import {Invocable} from '../expresiones/invocable.js';
+import {embebidas} from '../expresiones/embebidas.js';
+import {Aritmetica} from '../expresiones/aritmeticas.js';
 import {DecVariables} from '../expresiones/decVariables.js';
 import {Relacionales} from '../expresiones/relacionales.js';
 import {Logicas} from '../expresiones/logicas.js';
+import {Unaria} from '../expresiones/Unaria.js';
+import {AsigVariables} from '../expresiones/asigVariables.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -44,15 +46,15 @@ export class InterpreterVisitor extends BaseVisitor {
 
         if (['+', '-', '*', '/', '%'].includes(node.op)) {
             const aritmetica = new Aritmetica(izq, der, node.op);
-            return aritmetica.ejecutar();
+            return aritmetica.ejecutar(node);
         } else if (['==', '!=', '<', '<=', '>', '>='].includes(node.op)) {
             const relacionales = new Relacionales(izq, der, node.op);
-            return relacionales.ejecutar();
+            return relacionales.ejecutar(node);
         } else if (['&&', '||', '!'].includes(node.op)) {
             const logicas = new Logicas(izq, der, node.op);
-            return logicas.ejecutar();
+            return logicas.ejecutar(node);
         } else {
-            throw new Error(`Operador no soportado: ${node.op}`);
+            throw new Error(`Operador no soportado: ${node.op}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
         }
     }
 
@@ -63,13 +65,9 @@ export class InterpreterVisitor extends BaseVisitor {
       */
     visitOperacionUnaria(node) {
         const exp = node.exp.accept(this);
+        const unaria = new Unaria(exp, node.op);
+        return unaria.ejecutar(node);
 
-        switch (node.op) {
-            case '-':
-                return -exp;
-            default:
-                throw new Error(`Operador no soportado: ${node.op}`);
-        }
     }
 
 
@@ -123,7 +121,7 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const declararVariable = new DecVariables(tipoVariable, nombreVariable, valorVariable);
 
-        const {tipo, valor} = declararVariable.asignar();
+        const {tipo, valor} = declararVariable.asignar(node);
 
         this.entornoActual.setVariable(nombreVariable, {tipo, valor});
 
@@ -146,6 +144,12 @@ export class InterpreterVisitor extends BaseVisitor {
       */
     visitPrint(node) {
         const valor = node.exp.accept(this);
+
+        if(valor.tipo === null && valor.valor === null){ //significa que es una division por 0
+            this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
+            }
+
+
         this.salida += valor.valor + '\n';
     }
 
@@ -164,8 +168,14 @@ export class InterpreterVisitor extends BaseVisitor {
      * @type {BaseVisitor['visitAsignacion']}
      */
     visitAsignacion(node) {
-        // const valor = this.interpretar(node.asgn);
         const valor = node.asgn.accept(this);
+
+        const asignacion = new AsigVariables(node.id, valor);
+        const autorizacion = asignacion.asignar(this.entornoActual);
+
+        if (!autorizacion){
+            throw new Error(`No se pueden asignar tipos de datos diferentes a la variable ${node.id}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+        }
         this.entornoActual.assignVariable(node.id, valor);
 
         return valor;
@@ -184,7 +194,7 @@ export class InterpreterVisitor extends BaseVisitor {
             if (dcl) {
                 dcl.accept(this);
             } else {
-                console.error("Nodo undefined encontrado en 'dcls'");
+                console.error(`Nodo undefined encontrado en 'dcls'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             }
         });
 
@@ -320,11 +330,11 @@ export class InterpreterVisitor extends BaseVisitor {
         const argumentos = node.args.map(arg => arg.accept(this));
     
         if (!(funcion instanceof Invocable)) {
-            throw new Error(`La variable '${nombreFuncion}' no es invocable`);
+            throw new Error(`La variable '${nombreFuncion}' no es invocable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
         }
     
         if (funcion.aridad() !== argumentos.length) {
-            throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'`);
+            throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
         }
     
         const resultado = funcion.invocar(this, argumentos);

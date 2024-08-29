@@ -7,7 +7,7 @@ export class Aritmetica {
     }
 
     // Método para ejecutar la operación aritmética
-    ejecutar() {
+    ejecutar(node) {
 
         switch (this.op) {
             case '+':
@@ -38,7 +38,7 @@ export class Aritmetica {
                     return {tipo: 'string', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la suma");
+                throw new Error(`Operación no soportada en la suma\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                 
 
             case '-':
@@ -64,7 +64,7 @@ export class Aritmetica {
                     return {tipo:'float', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la resta");
+                throw new Error(`Operación no soportada en la resta\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
 
 
             case '*':
@@ -90,14 +90,14 @@ export class Aritmetica {
                     return {tipo:'float', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la multiplicación");
+                throw new Error(`Operación no soportada en la multiplicacion\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
 
 
             case '/':
                 if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
 
                     if(parseInt(this.der.valor) === 0){
-                        new Error("No se puede dividir entre 0");
+                        //new Error("No se puede dividir entre 0");
                         return {tipo: null, valor: null};
                     }
 
@@ -109,7 +109,7 @@ export class Aritmetica {
                 if(this.izq.tipo === 'int' && this.der.tipo === 'float'){
 
                     if(parseFloat(this.der.valor) === 0){
-                        new Error("No se puede dividir entre 0");
+                        //new Error("No se puede dividir entre 0");
                         return {tipo: null, valor: null};
                     }
 
@@ -121,7 +121,7 @@ export class Aritmetica {
                 if(this.izq.tipo === 'float' && this.der.tipo === 'float'){
 
                     if(parseFloat(this.der.valor) === 0){
-                        new Error("No se puede dividir entre 0");
+                        //new Error("No se puede dividir entre 0");
                         return {tipo: null, valor: null};
                     }
 
@@ -132,7 +132,7 @@ export class Aritmetica {
                 if(this.izq.tipo === 'float' && this.der.tipo === 'int'){
 
                     if(parseInt(this.der.valor) === 0){
-                        new Error("No se puede dividir entre 0");
+                        //new Error("No se puede dividir entre 0");
                         return {tipo: null, valor: null};
                     }
 
@@ -140,14 +140,14 @@ export class Aritmetica {
                     return {tipo:'float', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la división");
+                throw new Error(`Operación no soportada en la division\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
 
             case '%':
 
                 if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
 
                     if(parseInt(this.der.valor) === 0){
-                        new Error("No se puede dividir entre 0");
+                        //new Error("No se puede dividir entre 0");
                         return {tipo: null, valor: null};
                     }
 
@@ -155,10 +155,10 @@ export class Aritmetica {
                     return {tipo:'int', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en el módulo");                
+                throw new Error(`Operación no soportada en modulo\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);           
 
             default:
-                throw new Error("Operación no soportada");
+                throw new Error(`Operación no soportada \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
         }
     }
 }

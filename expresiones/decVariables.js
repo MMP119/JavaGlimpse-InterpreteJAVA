@@ -10,7 +10,7 @@ export class DecVariables {
 
 
     // Método para declarar una variable
-    asignar(){
+    asignar(node){
 
         //primero verificar si la variable viene con un tipo de dato y sin valor
         // por ejemplo int a;
@@ -34,7 +34,7 @@ export class DecVariables {
                 this.exp = {tipo: this.tipo, valor: ''};
             }
             else{
-                throw new Error("Tipo de dato no soportado en variable sin expresion");
+                throw new Error(`Tipo de dato no soportado en variable sin expresion\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             }
 
         }
@@ -54,7 +54,7 @@ export class DecVariables {
                             valor: this.exp.valor
                         }
                     }else{
-                        throw new Error("Tipo de dato incorrecto en la variable " + this.id+" se esperaba un entero");
+                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un entero\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                     }
                 
                 case 'float':
@@ -66,7 +66,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error("Tipo de dato incorrecto en la variable " + this.id+" se esperaba un flotante");
+                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un flotante\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                     }
                 
                 case 'string':
@@ -78,7 +78,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error("Tipo de dato incorrecto en la variable " + this.id+" se esperaba una cadena");
+                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba una cadena\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                     }
 
                 case 'boolean':
@@ -90,7 +90,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error("Tipo de dato incorrecto en la variable " + this.id+" se esperaba un booleano");
+                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                     }
 
                 case 'char':
@@ -102,7 +102,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error("Tipo de dato incorrecto en la variable " + this.id+" se esperaba un caracter");
+                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un caracter\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                     }
 
                 // si viene con var, entonces se debe detectar el tipo de dato
@@ -141,7 +141,7 @@ export class DecVariables {
                             }
 
                         default:
-                            throw new Error("Tipo de dato no soportado");
+                            throw new Error(`Tipo de dato no soportado en variable sin expresion\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                 
                     }
             }

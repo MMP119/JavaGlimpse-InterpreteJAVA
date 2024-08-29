@@ -62,11 +62,11 @@ document.getElementById('runButton').addEventListener('click', () => {
             );
         } else {
             // Manejar otros posibles errores
-            consoleEditor.setValue(
-                `Error: ${e.message}\n`+
-                `lase/Error: ${e.name}\n`+
-                `Stack: ${e.stack}`
-            );
+            const errorMessage = e.location 
+            ? `Error: ${e.message}\nLínea: ${e.location.start.line}, Columna: ${e.location.start.column}`
+            : `Error: ${e.message}`;
+
+            consoleEditor.setValue(errorMessage);
         }
     }
 });

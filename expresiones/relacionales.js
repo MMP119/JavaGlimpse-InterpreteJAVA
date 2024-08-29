@@ -7,7 +7,7 @@ export class Relacionales{
     }
 
 
-    ejecutar(){
+    ejecutar(node){
 
         switch(this.op){
 
@@ -42,7 +42,7 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la igualdad");
+                throw new Error(`Operación no soportada en la igualdad\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             
             case '!=':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -75,7 +75,7 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la desigualdad");
+                throw new Error(`Operación no soportada en la desigualdad\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
 
             case '>':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -103,7 +103,7 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la mayor que");
+                throw new Error(`Operación no soportada en la mayor que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             
             case '<':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -131,7 +131,7 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la menor que");
+                throw new Error(`Operación no soportada en la menor que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             
             case '>=':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -159,7 +159,7 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la mayor o igual que");
+                throw new Error(`Operación no soportada en la mayor o igual que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             
             case '<=':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -187,10 +187,10 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error("Operación no soportada en la menor o igual que");
+                throw new Error(`Operación no soportada en la menor o igual que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
 
             default:
-                throw new Error("Operador no soportado"); 
+                throw new Error(`Operador no soportado: ${this.op}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`); 
         }    
 
     }
