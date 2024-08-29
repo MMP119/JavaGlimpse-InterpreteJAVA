@@ -20,6 +20,7 @@
         "break": nodos.Break,
         "continue": nodos.Continue,
         "return": nodos.Return,
+        "llamada": nodos.Llamada
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -139,15 +140,23 @@ Multiplicacion = izq:Unaria expansion:(_ op:("*" / "/" / "%") _ der:Unaria { ret
 }
 
 
-Unaria = "-" _ num:Numero { return crearNodo('unaria', { op: '-', exp: num }) }
-
-    / Booleano
+Unaria = "-" _ num:Unaria { return crearNodo('unaria', { op: '-', exp: num }) }
     
-    / Numero
+    / LlamadaFuncion
 
     / Cadena
 
 
+LlamadaFuncion = callee:Numero _ params:("(" args: Argumentos? ")"{return args})*{
+    return params.reduce(
+        (callee, args) => {
+        return crearNodo('llamada', { callee, args: args || [] })
+        },
+        callee
+    )
+}
+
+Argumentos = arg: Expresion _ args:("," _ exp: Expresion {return exp})* {return [arg, ...args]} //para los argumentos de las funciones
 
 Numero = NumeroDecimal 
     

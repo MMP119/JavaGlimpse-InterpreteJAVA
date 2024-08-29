@@ -603,21 +603,21 @@ export class Llamada extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {Expresion} options.callee Expresion que se llama
- * @param {Expresion[]} options.args Argumentos de la funcion
+    * @param {Expresion} options.callee Expresion a llamar
+    * @param {Expresion[]} options.args Argumentos de la llamada
     */
     constructor({ callee, args }) {
         super();
         
         /**
-         * Expresion que se llama
+         * Expresion a llamar
          * @type {Expresion}
         */
         this.callee = callee;
 
 
         /**
-         * Argumentos de la funcion
+         * Argumentos de la llamada
          * @type {Expresion[]}
         */
         this.args = args;

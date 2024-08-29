@@ -5,6 +5,7 @@ export class Entorno {
      */
     constructor(padre = undefined) {
         this.valores = {};
+        this.funciones = {}; // para implementar las funciones embebidas
         this.padre = padre;
     }
 
@@ -33,6 +34,26 @@ export class Entorno {
         }
 
         throw new Error(`Variable ${nombre} no definida`); 
+    }
+
+    //para las funciones embebidas
+    setFuncion(nombre, funcion) {
+        if (this.funciones.hasOwnProperty(nombre)) {
+            throw new Error(`Función ${nombre} ya definida`);
+        }
+        this.funciones[nombre] = funcion;
+    }
+
+    getFuncion(nombre) {
+        const funcionActual = this.funciones[nombre];
+
+        if (funcionActual !== undefined) return funcionActual;
+
+        if (this.padre) {
+            return this.padre.getFuncion(nombre);
+        }
+
+        throw new Error(`Función ${nombre} no definida`);
     }
 
     /**

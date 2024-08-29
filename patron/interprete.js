@@ -1,18 +1,26 @@
 import {Entorno} from './entorno.js'
 import {BaseVisitor} from './visitor.js'
 import nodos, {Expresion} from './nodos.js';
+import { ExcepcionBrake, ExcepcionContinue, ExcepcionReturn } from '../expresiones/transferencia.js';
+import { Invocable } from '../expresiones/invocable.js';
+import { embebidas } from '../expresiones/embebidas.js';
 import { Aritmetica } from '../expresiones/aritmeticas.js';
 import {DecVariables} from '../expresiones/decVariables.js';
 import {Relacionales} from '../expresiones/relacionales.js';
 import {Logicas} from '../expresiones/logicas.js';
-import { ExcepcionBrake, ExcepcionContinue, ExcepcionReturn } from '../expresiones/transferencia.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
     constructor() {
         super();
-        this.entornoActual = new Entorno();
+        this.entornoActual = new Entorno(); //este es el entorno global, se inicia el visitor
         this.salida = '';
+
+        // funciones embebidas
+        Object.entries(embebidas).forEach(([nombre, funcion]) => {
+            this.entornoActual.setFuncion(nombre, funcion);
+            //console.log(`Función embebida: ${nombre}`, funcion);  // Imprime para verificar que las funciones están siendo añadidas correctamente
+        });
 
         //para los errores
         this.errores = []; //almacenar los errores+
@@ -25,9 +33,7 @@ export class InterpreterVisitor extends BaseVisitor {
 
     }
 
-    interpretar(nodo) {
-        return nodo.accept(this);
-    }
+
 
     /**
       * @type {BaseVisitor['visitOperacionBinaria']}
@@ -50,6 +56,8 @@ export class InterpreterVisitor extends BaseVisitor {
         }
     }
 
+
+
     /**
       * @type {BaseVisitor['visitOperacionUnaria']}
       */
@@ -64,12 +72,16 @@ export class InterpreterVisitor extends BaseVisitor {
         }
     }
 
+
+
     /**
       * @type {BaseVisitor['visitAgrupacion']}
       */
     visitAgrupacion(node) {
         return node.exp.accept(this);
     }
+
+
 
     /**
       * @type {BaseVisitor['visitNumero']}
@@ -79,12 +91,16 @@ export class InterpreterVisitor extends BaseVisitor {
         return {tipo: node.tipo, valor: node.valor};
     }
 
+
+
     /**
      * @type {BaseVisitor['visitCadena']}
      */
     visitCadena(node){
         return {tipo: node.tipo, valor: node.valor};
     }    
+
+
 
     /**
      * @type {BaseVisitor['visitBooleano']}
@@ -93,6 +109,8 @@ export class InterpreterVisitor extends BaseVisitor {
     visitBooleano(node){
         return {tipo: node.tipo, valor: node.valor};
     }
+
+
 
     //para las declaraciones de las variables
     /**
@@ -110,6 +128,8 @@ export class InterpreterVisitor extends BaseVisitor {
         this.entornoActual.setVariable(nombreVariable, {tipo, valor});
 
     }
+
+
 
     /**
       * @type {BaseVisitor['visitReferenciaVariable']}
@@ -130,12 +150,15 @@ export class InterpreterVisitor extends BaseVisitor {
     }
 
 
+
     /**
       * @type {BaseVisitor['visitExpresionStmt']}
       */
     visitExpresionStmt(node) {
         node.exp.accept(this);
     }
+
+
 
     /**
      * @type {BaseVisitor['visitAsignacion']}
@@ -147,6 +170,8 @@ export class InterpreterVisitor extends BaseVisitor {
 
         return valor;
     }
+
+
 
     /**
      * @type {BaseVisitor['visitBloque']}
@@ -166,6 +191,8 @@ export class InterpreterVisitor extends BaseVisitor {
         this.entornoActual = entornoAnterior;
     }
 
+
+
     /**
      * @type {BaseVisitor['visitIf']}
      */
@@ -182,6 +209,8 @@ export class InterpreterVisitor extends BaseVisitor {
         }
 
     }
+
+
 
     /**
      * @type {BaseVisitor['visitWhile']}
@@ -211,6 +240,8 @@ export class InterpreterVisitor extends BaseVisitor {
         }
     }
 
+
+
     /**
      * @type {BaseVisitor['visitFor']}
      */
@@ -238,6 +269,8 @@ export class InterpreterVisitor extends BaseVisitor {
         this.antesContinue = incrementoAntes;
     }
 
+
+
     /**
      * @type {BaseVisitor['visitBreak']}
      */
@@ -246,6 +279,7 @@ export class InterpreterVisitor extends BaseVisitor {
 
 
     }
+
 
 
     /**
@@ -260,6 +294,8 @@ export class InterpreterVisitor extends BaseVisitor {
         throw new ExcepcionContinue();
     }
 
+
+
     /**
      * @type {BaseVisitor['visitReturn']}
      */
@@ -273,12 +309,26 @@ export class InterpreterVisitor extends BaseVisitor {
         throw new ExcepcionReturn(valor);
     }
 
+
+
     /**
      * @type {BaseVisitor['visitLlamada']}
      */
-    visitLlamada(node){
-        
-
+    visitLlamada(node) {
+        const nombreFuncion = node.callee.id;
+        const funcion = this.entornoActual.getFuncion(nombreFuncion);
+        const argumentos = node.args.map(arg => arg.accept(this));
+    
+        if (!(funcion instanceof Invocable)) {
+            throw new Error(`La variable '${nombreFuncion}' no es invocable`);
+        }
+    
+        if (funcion.aridad() !== argumentos.length) {
+            throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'`);
+        }
+    
+        const resultado = funcion.invocar(this, argumentos);
+        return resultado;
     }
 
 }
