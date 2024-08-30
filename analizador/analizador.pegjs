@@ -22,6 +22,7 @@
         "return": nodos.Return,
         "llamada": nodos.Llamada,
         "ternario": nodos.Ternario,
+        "switch": nodos.Switch,
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -62,6 +63,8 @@ Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('pri
 
     / "return" _ exp:Expresion? _ ";" { return crearNodo('return', { exp }) }
 
+    / SwitchStmt //reglas para el switch-case
+
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
 
 
@@ -70,6 +73,15 @@ ForInit = dcl:Declaracion { return dcl }
         / exp:Expresion _ ";"{ return exp }
 
         / ";" { return null }
+
+
+SwitchStmt = "switch" _ "(" _ exp:Expresion _ ")" _ "{" _ cases: CaseClause* _ defaultClause: DefaultClause? _ "}"{return crearNodo('switch', { exp, cases, defaultClause: defaultClause || null });}
+
+
+CaseClause = _ "case" _ exp:Expresion _ ":" _ stmt:( _ st:Stmt _ { return st })*{return { exp, stmt: stmt || [] };}
+
+
+DefaultClause = "default" _ ":" _ stmt:(_ st:Stmt _{return st})*{return { stmt };}
 
 
 Expresion = Asignacion
@@ -94,6 +106,10 @@ OperadorAsignacion = id: Identificador _ expansion:( _ op:("+=" / "-=") _  der:R
     return crearNodo('asignacion', { id, asgn: expresionAritmetica });
 }
 
+
+Ternario = cond:Comparacion _ "?" _ expTrue:Expresion _ ":" _ expFalse:Expresion { return crearNodo('ternario', { cond, expTrue, expFalse }) }
+
+
 Or = izq:And expansion:(_ "||" _ der:And { return der })* 
 { 
     return expansion.reduce(
@@ -114,9 +130,6 @@ And = izq:Comparacion expansion:(_ "&&" _ der:Comparacion { return der })*
     izq
     )
 }
-
-
-Ternario = cond:Comparacion _ "?" _ expTrue:Expresion _ ":" _ expFalse:Expresion { return crearNodo('ternario', { cond, expTrue, expFalse }) }
 
 
 Comparacion = izq:Relacionales expansion:(_ op:("==" / "!=") _ der:Relacionales { return { tipo: op, der } })* 

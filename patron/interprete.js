@@ -210,8 +210,13 @@ export class InterpreterVisitor extends BaseVisitor {
      * @type {BaseVisitor['visitIf']}
      */
     visitIf(node) {
-        console.log(node);
+
         const cond = node.cond.accept(this);
+        
+        //verificar que la condicion sea un booleano
+        if (cond.tipo !== 'boolean') {
+            throw new Error(`Semantico; La condición del if debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+        }
 
         if (cond.valor) {
             node.stmtTrue.accept(this);
@@ -245,6 +250,11 @@ export class InterpreterVisitor extends BaseVisitor {
         const entornoAnterior = this.entornoActual;
 
         try{
+
+            //verificar que la condicion sea un booleano
+            if (node.cond.accept(this).tipo !== 'boolean') {
+                throw new Error(`Semantico; La condición del while debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            }
 
             while (node.cond.accept(this).valor) {
                 node.stmt.accept(this);
@@ -295,6 +305,58 @@ export class InterpreterVisitor extends BaseVisitor {
         this.antesContinue = incrementoAntes;
     }
 
+
+
+    /**
+     * @type {BaseVisitor['visitSwitch']}
+     */
+    visitSwitch(node){
+
+        try{
+
+            const switchValue = node.exp.accept(this);
+
+            //bandera para saber si ya se ejecutado un bloque de un case
+            let continueExecution = false;
+    
+            //iteracion solbre los casos
+            for (const caseNode of node.cases){
+                //evaluar la expresion del case
+                const caseValue = caseNode.exp.accept(this);
+    
+                //si el valor del case es igual al valor del switch
+                if(continueExecution || switchValue.valor === caseValue.valor){
+                    
+                    //ejecutar el bloque de sentencias
+                    for(const stmt of caseNode.stmt){
+                        stmt.accept(this);
+                    }               
+                    continueExecution = true;
+                }
+            }
+
+            //si no se ejecuto ningun case
+            if(!continueExecution && node.defaultClause){
+                //ejecutar las sentencias del default
+                for(const stmt of node.defaultClause.stmt){
+                    stmt.accept(this);
+                }
+            }
+
+        }catch(e){
+                
+                if(e instanceof ExcepcionBrake){
+                    return;
+                }
+    
+                if(e instanceof ExcepcionContinue){
+                    return this.visitSwitch(node);
+                }
+    
+                throw e;
+        }
+
+    }
 
 
     /**
