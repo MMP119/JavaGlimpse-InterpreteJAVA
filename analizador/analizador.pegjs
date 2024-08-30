@@ -24,6 +24,8 @@
         "ternario": nodos.Ternario,
         "switch": nodos.Switch,
         "declaracionArreglo": nodos.DeclaracionArreglo,
+        "arrayFunc": nodos.ArrayFunc,
+
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -102,13 +104,21 @@ Expresion = Asignacion
 
 Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asignacion', { id, asgn }) }
 
-            //asignacion de arrays a otro array
+            / ArrayFunc
 
             / OperadorAsignacion
 
             / Ternario
             
             / Or
+
+
+ArrayFunc = id:Identificador _ "." _ method:("indexOf"/"join"/"length") _ exp:("(" _  exp:Expresion? _ ")" {return exp})? {return crearNodo('arrayFunc', { id, method, exp })} 
+    
+    / id:Identificador _ "[" _ index:Expresion _ "]" _ "=" _ value:Expresion      {return crearNodo('arrayFunc', { id, method:'setElement', exp:[index, value]});} 
+
+    / id:Identificador _ "[" _ index:Expresion _ "]"                          {const value = null; return crearNodo('arrayFunc', { id, method:'getElement', exp:[index,value]});} 
+
 
 
 OperadorAsignacion = id: Identificador _ expansion:( _ op:("+=" / "-=") _  der:Relacionales { return { tipo: op, der } }) 
@@ -226,6 +236,8 @@ Datos =  "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
     / Cadena
 
     / Booleano
+
+    / ArrayFunc
 
     / id:Identificador { return crearNodo('referenciaVariable', { id }) }
 

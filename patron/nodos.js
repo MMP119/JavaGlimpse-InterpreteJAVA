@@ -771,4 +771,45 @@ export class DeclaracionArreglo extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo }
+export class ArrayFunc extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.id Identificador del arreglo
+ * @param {string} options.method método que se va a ejecutar
+ * @param {Expresion} options.exp expresion, indice o valor
+    */
+    constructor({ id, method, exp }) {
+        super();
+        
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * método que se va a ejecutar
+         * @type {string}
+        */
+        this.method = method;
+
+
+        /**
+         * expresion, indice o valor
+         * @type {Expresion}
+        */
+        this.exp = exp;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitArrayFunc(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, ArrayFunc }

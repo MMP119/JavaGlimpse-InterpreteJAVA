@@ -69,6 +69,9 @@
 
  * @typedef {import('./nodos').DeclaracionArreglo} DeclaracionArreglo
 
+
+ * @typedef {import('./nodos').ArrayFunc} ArrayFunc
+
  */
 
 
@@ -283,6 +286,15 @@ export class BaseVisitor {
      */
     visitDeclaracionArreglo(node) {
         throw new Error('Metodo visitDeclaracionArreglo no implementado');
+    }
+    
+
+    /**
+     * @param {ArrayFunc} node
+     * @returns {any}
+     */
+    visitArrayFunc(node) {
+        throw new Error('Metodo visitArrayFunc no implementado');
     }
     
 }

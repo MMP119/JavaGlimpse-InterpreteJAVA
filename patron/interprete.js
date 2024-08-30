@@ -11,6 +11,7 @@ import {Relacionales} from '../expresiones/relacionales.js';
 import {Logicas} from '../expresiones/logicas.js';
 import {Unaria} from '../expresiones/Unaria.js';
 import {AsigVariables} from '../expresiones/asigVariables.js';
+import {ArrayFunc} from '../expresiones/arrayFunc.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -141,7 +142,15 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const idArreglo1 = node.id;
         const tipoArreglo1 = node.tipo;
-        const expresion = node.exp;
+
+        //verificar si node.exp es un arreglo o no
+        let expresion = null;
+        if(Array.isArray(node.exp)){
+            expresion = node.exp;
+        }else{
+            expresion = node.exp.accept(this);
+        }
+
         const tipoArreglo2 = node.tipo2;
         const idArreglo2 = node.id2 ? node.id2.accept(this): node.id2;
 
@@ -154,6 +163,36 @@ export class InterpreterVisitor extends BaseVisitor {
         
         this.entornoActual.setVariable(idArreglo1, {tipo, valor});
 
+    }
+
+    /**
+      * @type {BaseVisitor['visitArrayFunc']}
+      */
+    visitArrayFunc(node){
+        const id = node.id;
+
+        if(Array.isArray(node.exp) && node.exp[1] !== null){
+            node.exp[1] = node.exp[1].accept(this);
+        }
+        
+        //buscar el arreglo en el entorno
+        const arreglo = this.entornoActual.getVariable(id);
+
+        //si no existe el arreglo
+        if(!arreglo){
+            throw new Error(`El arreglo '${id}' no existe en el entorno actual\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+        }
+
+        const arrayFunc = new ArrayFunc(arreglo, node.method, node.exp);
+        
+
+        if(Array.isArray(node.exp) && node.exp[1] == null){
+            let v = node.exp[0].accept(this);
+            return arrayFunc.getElement(node, v);
+        }
+
+        return arrayFunc.ejecutar(node);
+        
     }
 
 
