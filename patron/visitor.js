@@ -66,6 +66,9 @@
 
  * @typedef {import('./nodos').Switch} Switch
 
+
+ * @typedef {import('./nodos').DeclaracionArreglo} DeclaracionArreglo
+
  */
 
 
@@ -271,6 +274,15 @@ export class BaseVisitor {
      */
     visitSwitch(node) {
         throw new Error('Metodo visitSwitch no implementado');
+    }
+    
+
+    /**
+     * @param {DeclaracionArreglo} node
+     * @returns {any}
+     */
+    visitDeclaracionArreglo(node) {
+        throw new Error('Metodo visitDeclaracionArreglo no implementado');
     }
     
 }

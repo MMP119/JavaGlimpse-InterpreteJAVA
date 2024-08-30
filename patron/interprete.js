@@ -6,6 +6,7 @@ import {Invocable} from '../expresiones/invocable.js';
 import {embebidas} from '../expresiones/embebidas.js';
 import {Aritmetica} from '../expresiones/aritmeticas.js';
 import {DecVariables} from '../expresiones/decVariables.js';
+import {DecArreglos} from '../expresiones/decArreglos.js';
 import {Relacionales} from '../expresiones/relacionales.js';
 import {Logicas} from '../expresiones/logicas.js';
 import {Unaria} from '../expresiones/Unaria.js';
@@ -127,6 +128,31 @@ export class InterpreterVisitor extends BaseVisitor {
         const {tipo, valor} = declararVariable.asignar(node);
 
         this.entornoActual.setVariable(nombreVariable, {tipo, valor});
+
+    }
+
+
+
+    
+    /**
+     * @type {BaseVisitor['visitDeclaracionArreglo']}
+     */
+    visitDeclaracionArreglo(node){
+
+        const idArreglo1 = node.id;
+        const tipoArreglo1 = node.tipo;
+        const expresion = node.exp;
+        const tipoArreglo2 = node.tipo2;
+        const idArreglo2 = node.id2 ? node.id2.accept(this): node.id2;
+
+        const declararArreglo = new DecArreglos(tipoArreglo1, idArreglo1, expresion, tipoArreglo2, idArreglo2);
+
+        declararArreglo.verificarReservada(node, idArreglo1, idArreglo2);
+
+        const {tipo, valor} = declararArreglo.declarar(node);
+        //console.log(valor[3]); //prueba de impresion de un valor de un arreglo en una posicion especifica
+        
+        this.entornoActual.setVariable(idArreglo1, {tipo, valor});
 
     }
 

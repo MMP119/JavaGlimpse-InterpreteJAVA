@@ -23,6 +23,7 @@
         "llamada": nodos.Llamada,
         "ternario": nodos.Ternario,
         "switch": nodos.Switch,
+        "declaracionArreglo": nodos.DeclaracionArreglo,
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -44,6 +45,18 @@ Declaracion = dcl:DecVariable _ { return dcl }
 DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresion _ ";" { return crearNodo('declaracionTipoVariable', { tipo, id, exp }) }
 
             / tipo:TiposDatosPrimitivos _ id:Identificador _ ";" { const exp = null; return crearNodo('declaracionTipoVariable', { tipo, id, exp }) }
+
+            //declaracion de arrays con inicializacion de valores
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ "{" _ exp:ExpresionConComa _ "}" _ ";" {const tipo2 = null; const id2 = null; return crearNodo('declaracionArreglo',{tipo, id, exp, tipo2, id2})}
+
+            //declaracion de arrays reservando un espacio especifico
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ "new" _  tipo2:TiposDatosPrimitivos _ "[" _ exp:Expresion _ "]" _ ";" {const id2=null; return crearNodo('declaracionArreglo',{tipo, id, exp, tipo2, id2})}
+
+            //declaracion cuadno es una copia de otro array
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ id2:Expresion _ ";" {const exp = null; const tipo2 = null;return crearNodo('declaracionArreglo',{tipo, id, exp, tipo2, id2})}
+
+
+ExpresionConComa = exp:Expresion _ coma:("," _ exp2:Expresion{return exp2})* { return [exp, ...coma] } //para las expresiones con coma
 
 
 // steatements NO DECLARATIVOS, es decir, que no declaran variables
@@ -88,6 +101,8 @@ Expresion = Asignacion
 
 
 Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asignacion', { id, asgn }) }
+
+            //asignacion de arrays a otro array
 
             / OperadorAsignacion
 

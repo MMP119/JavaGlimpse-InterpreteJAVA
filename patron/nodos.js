@@ -714,4 +714,61 @@ export class Switch extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Break, Continue, Return, Llamada, Ternario, Switch }
+export class DeclaracionArreglo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo del arreglo
+ * @param {string} options.id Identificador del arreglo
+ * @param {Expresion} options.exp Expresion del arreglo
+ * @param {string} options.tipo2 Tipo del arreglo 2
+ * @param {Expresion} options.id2 Identificador del arreglo 2
+    */
+    constructor({ tipo, id, exp, tipo2, id2 }) {
+        super();
+        
+        /**
+         * Tipo del arreglo
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Expresion del arreglo
+         * @type {Expresion}
+        */
+        this.exp = exp;
+
+
+        /**
+         * Tipo del arreglo 2
+         * @type {string}
+        */
+        this.tipo2 = tipo2;
+
+
+        /**
+         * Identificador del arreglo 2
+         * @type {Expresion}
+        */
+        this.id2 = id2;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionArreglo(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo }
