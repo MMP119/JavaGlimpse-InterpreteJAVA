@@ -23,7 +23,7 @@ export class DecArreglos{
             'let', 'long', 'native', 'new', 'null', 'package', 'private', 'protected', 'public', 
             'return', 'short', 'static', 'super', 'switch', 'synchronized', 'this', 'throw', 
             'transient', 'true', 'try', 'typeof', 'var', 'void', 'volatile', 'while', 'with', 
-            'yield'
+            'yield', 'join', 'length', 'indexOf'
         ]);
     
         if(reservedWords.has(this.id)){
