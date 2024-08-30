@@ -104,21 +104,11 @@ Expresion = Asignacion
 
 Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asignacion', { id, asgn }) }
 
-            / ArrayFunc
-
             / OperadorAsignacion
 
             / Ternario
             
             / Or
-
-
-ArrayFunc = id:Identificador _ "." _ method:("indexOf"/"join"/"length") _ exp:("(" _  exp:Expresion? _ ")" {return exp})? {return crearNodo('arrayFunc', { id, method, exp })} 
-    
-    / id:Identificador _ "[" _ index:Expresion _ "]" _ "=" _ value:Expresion      {return crearNodo('arrayFunc', { id, method:'setElement', exp:[index, value]});} 
-
-    / id:Identificador _ "[" _ index:Expresion _ "]"                          {const value = null; return crearNodo('arrayFunc', { id, method:'getElement', exp:[index,value]});} 
-
 
 
 OperadorAsignacion = id: Identificador _ expansion:( _ op:("+=" / "-=") _  der:Relacionales { return { tipo: op, der } }) 
@@ -241,6 +231,12 @@ Datos =  "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
 
     / id:Identificador { return crearNodo('referenciaVariable', { id }) }
 
+
+ArrayFunc = id:Identificador _ "." _ method:("indexOf"/"join"/"length") _ exp:("(" _  exp:Expresion? _ ")" {return exp})? {return crearNodo('arrayFunc', { id, method, exp })} 
+    
+    / id:Identificador _ "[" _ index:Expresion _ "]" _ "=" _ value:Expresion      {return crearNodo('arrayFunc', { id, method:'setElement', exp:[index, value]});} 
+
+    / id:Identificador _ "[" _ index:Expresion _ "]"                          {const value = null; return crearNodo('arrayFunc', { id, method:'getElement', exp:[index,value]});} 
 
 
 NumeroEntero = [0-9]+//( "." [0-9]+ )? 

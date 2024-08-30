@@ -170,10 +170,6 @@ export class InterpreterVisitor extends BaseVisitor {
       */
     visitArrayFunc(node){
         const id = node.id;
-
-        if(Array.isArray(node.exp) && node.exp[1] !== null){
-            node.exp[1] = node.exp[1].accept(this);
-        }
         
         //buscar el arreglo en el entorno
         const arreglo = this.entornoActual.getVariable(id);
@@ -185,6 +181,23 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const arrayFunc = new ArrayFunc(arreglo, node.method, node.exp);
         
+        
+        if(Array.isArray(node.exp) && node.exp[1] != null){
+            // try{
+            // node.exp[0] = node.exp[0].accept(this);
+            // node.exp[1] = node.exp[1].accept(this);
+            // }catch(e){
+            //     console.log(e);
+            //     console.log(node.exp);
+            //     console.log(node.location.start.line);
+            // }
+
+            let v1 = node.exp[0].accept(this);
+            let v2 = node.exp[1].accept(this);
+
+            return arrayFunc.setElement(node, [v1, v2]);
+
+        }
 
         if(Array.isArray(node.exp) && node.exp[1] == null){
             let v = node.exp[0].accept(this);

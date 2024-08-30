@@ -20,7 +20,7 @@ export class ArrayFunc {
             case 'getElement':
                 return {tipo:'string', valor:'getElement'};
             case 'setElement':
-                return this.setElement(node, this.params);
+                return {tipo:'string', valor:'setElement'};
             default:
                 throw new Error(`Función de arreglo no soportada: ${this.method}`);
         }
