@@ -173,15 +173,14 @@ export class InterpreterVisitor extends BaseVisitor {
       */
     visitPrint(node) {
         const valor = node.exp.accept(this);
-
-        if(valor.tipo === null && valor.valor === null){ //significa que es una division por 0
+    
+        if (valor.tipo === null && valor.valor === null) {
             this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
-            }
-
-
-        this.salida += valor.valor + '\n';
+        }
+    
+        // Usamos JSON.stringify para imprimir los arrays con corchetes
+        this.salida += Array.isArray(valor.valor) ? JSON.stringify(valor.valor) + '\n' : valor.valor + '\n';
     }
-
 
 
     /**
