@@ -2,6 +2,7 @@ import {Entorno} from './entorno.js'
 import {BaseVisitor} from './visitor.js'
 import nodos, {Expresion} from './nodos.js';
 import {ExcepcionBrake, ExcepcionContinue, ExcepcionReturn} from '../expresiones/transferencia.js';
+import { registrarError } from '../global/errores.js';
 import {Invocable} from '../expresiones/invocable.js';
 import {embebidas} from '../expresiones/embebidas.js';
 import {Aritmetica} from '../expresiones/aritmeticas.js';
@@ -56,7 +57,8 @@ export class InterpreterVisitor extends BaseVisitor {
             const logicas = new Logicas(izq, der, node.op);
             return logicas.ejecutar(node);
         } else {
-            throw new Error(`Operador no soportado: ${node.op}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError(`Operador desconocido: ${node.op}`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
         }
     }
 
@@ -124,7 +126,7 @@ export class InterpreterVisitor extends BaseVisitor {
         const declararVariable = new DecVariables(tipoVariable, nombreVariable, valorVariable);
 
         //verificar si la variable es una palabra reservada
-        declararVariable.verificarReservada(node, nombreVariable);
+        if(declararVariable.verificarReservada(node, nombreVariable)) return;
 
         const {tipo, valor} = declararVariable.asignar(node);
 
@@ -176,7 +178,9 @@ export class InterpreterVisitor extends BaseVisitor {
 
         //si no existe el arreglo
         if(!arreglo){
-            throw new Error(`El arreglo '${id}' no existe en el entorno actual\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            //throw new Error(`El arreglo '${id}' no existe en el entorno actual\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError(`El arreglo '${id}' no existe en el entorno actual`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
         }
 
         const arrayFunc = new ArrayFunc(arreglo, node.method, node.exp);
@@ -221,18 +225,39 @@ export class InterpreterVisitor extends BaseVisitor {
 
 
     /**
-      * @type {BaseVisitor['visitPrint']}
-      */
+     * @type {BaseVisitor['visitPrint']}
+     */
     visitPrint(node) {
-        const valor = node.exp.accept(this);
-    
-        if (valor.tipo === null && valor.valor === null) {
-            this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
-        }
-    
-        // Usamos JSON.stringify para imprimir los arrays con corchetes
-        this.salida += Array.isArray(valor.valor) ? JSON.stringify(valor.valor) + '\n' : valor.valor + '\n';
+
+        // Crear una variable temporal para almacenar los resultados antes de agregarlos a la salida
+        let resultado = "";
+
+        // Recorrer el array de expresiones
+        node.exp.forEach((exp, index) => {
+            const valor = exp.accept(this);
+
+            // Si el valor es null, manejar el caso de división por 0
+            if (valor.tipo === null && valor.valor === null) {
+                this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
+            } else {
+                // Usar JSON.stringify si es un array, o concatenar directamente si es otro tipo de valor
+                if (Array.isArray(valor.valor)) {
+                    resultado += JSON.stringify(valor.valor);
+                } else {
+                    resultado += valor.valor;
+                }
+            }
+
+            // Solo agregar un espacio si no es el último valor
+            if (index < node.exp.length - 1) {
+                resultado += " ";
+            }
+        });
+
+        // Agregar el resultado con un salto de línea al final
+        this.salida += resultado + '\n';
     }
+
 
 
     /**
@@ -254,7 +279,9 @@ export class InterpreterVisitor extends BaseVisitor {
         const autorizacion = asignacion.asignar(this.entornoActual);
 
         if (!autorizacion){
-            throw new Error(`No se pueden asignar tipos de datos diferentes a la variable ${node.id}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            //throw new Error(`No se pueden asignar tipos de datos diferentes a la variable ${node.id}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError(`No se pueden asignar tipos de datos diferentes a la variable ${node.id}`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
         }
         this.entornoActual.assignVariable(node.id, valor);
 
@@ -292,7 +319,9 @@ export class InterpreterVisitor extends BaseVisitor {
         
         //verificar que la condicion sea un booleano
         if (cond.tipo !== 'boolean') {
-            throw new Error(`Semantico; La condición del if debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            //throw new Error(`Semantico; La condición del if debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError(`La condición del if debe ser de tipo booleano`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
         }
 
         if (cond.valor) {
@@ -330,7 +359,9 @@ export class InterpreterVisitor extends BaseVisitor {
 
             //verificar que la condicion sea un booleano
             if (node.cond.accept(this).tipo !== 'boolean') {
-                throw new Error(`Semantico; La condición del while debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                //throw new Error(`Semantico; La condición del while debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError(`La condición del while debe ser de tipo booleano`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
             }
 
             while (node.cond.accept(this).valor) {
@@ -485,11 +516,15 @@ export class InterpreterVisitor extends BaseVisitor {
         const argumentos = node.args.map(arg => arg.accept(this));
     
         if (!(funcion instanceof Invocable)) {
-            throw new Error(`La variable '${nombreFuncion}' no es invocable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            //throw new Error(`La variable '${nombreFuncion}' no es invocable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError(`La variable '${nombreFuncion}' no es invocable`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
         }
     
         if (funcion.aridad() !== argumentos.length) {
-            throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            //throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError(`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
         }
     
         const resultado = funcion.invocar(this, argumentos);

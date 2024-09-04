@@ -1,4 +1,4 @@
-import {Entorno} from '../patron/entorno.js';
+import {registrarError} from '../global/errores.js';
 
 export class DecVariables {
 
@@ -23,7 +23,8 @@ export class DecVariables {
         ]);
     
         if(reservedWords.has(this.id)){
-            throw new Error(`La variable ${id} es una palabra reservada\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError("Semantico: Variable con nombre de palabra reservada", node.location.start.line, node.location.start.column);
+            return true;
         }
     
     }
@@ -54,7 +55,11 @@ export class DecVariables {
                 this.exp = {tipo: this.tipo, valor: ''};
             }
             else{
-                throw new Error(`Tipo de dato no soportado en variable sin expresion\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError("Semantico: Tipo de dato no soportado", node.location.start.line, node.location.start.column);
+                return {
+                    tipo: 'Error',
+                    valor: null
+                }
             }
 
         }
@@ -74,7 +79,12 @@ export class DecVariables {
                             valor: this.exp.valor
                         }
                     }else{
-                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un entero\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un int", node.location.start.line, node.location.start.column);
+                        return {
+                            tipo: 'Error',
+                            valor: null
+                        }
+                        //throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un entero\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
                     }
                 
                 case 'float':
@@ -86,7 +96,11 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un flotante\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un float", node.location.start.line, node.location.start.column);
+                        return {
+                            tipo: 'Error',
+                            valor: null
+                        }
                     }
                 
                 case 'string':
@@ -98,7 +112,11 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba una cadena\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un string", node.location.start.line, node.location.start.column);
+                        return {
+                            tipo: 'Error',
+                            valor: null
+                        }
                     }
 
                 case 'boolean':
@@ -110,7 +128,11 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un boolean", node.location.start.line, node.location.start.column);
+                        return {
+                            tipo: 'Error',
+                            valor: null
+                        }
                     }
 
                 case 'char':
@@ -122,7 +144,11 @@ export class DecVariables {
                         }
                     }
                     else{
-                        throw new Error(`Tipo de dato incorrecto en la variable ${this.id}se esperaba un caracter\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un char", node.location.start.line, node.location.start.column);
+                        return {
+                            tipo: 'Error',
+                            valor: null
+                        }
                     }
 
                 // si viene con var, entonces se debe detectar el tipo de dato
@@ -161,8 +187,11 @@ export class DecVariables {
                             }
 
                         default:
-                            throw new Error(`Tipo de dato no soportado en variable sin expresion\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-                
+                            registrarError("Semantico: Tipo de dato no soportado en variable con var", node.location.start.line, node.location.start.column);
+                            return {
+                                tipo: 'Erorr',
+                                valor: null
+                            }
                     }
             }
         }   

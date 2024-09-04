@@ -70,7 +70,7 @@ ExpresionConComa = exp:Expresion _ coma:("," _ exp2:Expresion{return exp2})* { r
 
 
 // steatements NO DECLARATIVOS, es decir, que no declaran variables
-Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
+Stmt = "System.out.println(" _ exp:ExpresionConComa _ ")" _ ";" { return crearNodo('print', { exp }) }
 
     / "{" _ dcls:Declaracion* _ "}" { return crearNodo('bloque', { dcls }) }
 

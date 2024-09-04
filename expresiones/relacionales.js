@@ -1,3 +1,5 @@
+import { registrarError } from '../global/errores.js';
+
 export class Relacionales{
 
     constructor(izq, der, op){
@@ -42,7 +44,8 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la igualdad\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en la igualdad`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
             
             case '!=':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -75,7 +78,9 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la desigualdad\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en la desigualdad`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+
 
             case '>':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -103,7 +108,9 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la mayor que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en la mayor que`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+
             
             case '<':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -131,7 +138,8 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la menor que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en la menor que`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
             
             case '>=':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -159,7 +167,9 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la mayor o igual que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en la mayor o igual que`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+
             
             case '<=':
                 if(this.izq.tipo === 'int' && this.der.tipo === 'int'){
@@ -187,10 +197,14 @@ export class Relacionales{
                     return {tipo: 'boolean', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la menor o igual que\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en la menor o igual que`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
 
             default:
-                throw new Error(`Operador no soportado: ${this.op}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`); 
+
+                registrarError('Semántico', `Operador no soportado: ${this.op}`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+
         }    
 
     }

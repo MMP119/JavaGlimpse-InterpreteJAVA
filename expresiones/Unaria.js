@@ -1,3 +1,5 @@
+import { registrarError } from '../global/errores.js';
+
 export class Unaria {
 
     constructor(exp, op) {
@@ -16,7 +18,8 @@ export class Unaria {
                     const resultado = -this.exp.valor;
                     return {tipo: this.exp.tipo, valor: resultado};
                 }else{
-                    throw new Error(`No se puede hacer una operacion unaria si no es entero o decimal\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                    registrarError('Semántico', `No se puede hacer una operacion unaria si no es entero o decimal`, node.location.start.line, node.location.start.column);
+                    return {tipo: 'Error', valor: null};
                 }
 
             case '!':
@@ -25,12 +28,14 @@ export class Unaria {
                     const resultado = !this.exp.valor;
                     return {tipo: this.exp.tipo, valor: resultado};
                 }else{
-                    throw new Error(`No se puede hacer una operacion unaria si no es booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                    registrarError('Semántico', `No se puede hacer una operacion unaria si no es booleano`, node.location.start.line, node.location.start.column);
+                    return {tipo: 'Error', valor: null};
                 }
 
 
             default:
-                throw new Error(`Operador no soportado: ${this.op}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operador no soportado: ${this.op}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                return {tipo: 'Error', valor: null};
         }
     }
 }

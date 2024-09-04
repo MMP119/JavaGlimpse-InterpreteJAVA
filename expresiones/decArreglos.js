@@ -1,4 +1,5 @@
 import { Entorno } from "../patron/entorno.js";
+import { registrarError } from '../global/errores.js';
 
 export class DecArreglos{
 
@@ -27,11 +28,13 @@ export class DecArreglos{
         ]);
     
         if(reservedWords.has(this.id)){
-            throw new Error(`La variable ${id} es una palabra reservada\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError('Semántico', `La variable ${id} es una palabra reservada`, node.location.start.line, node.location.start.column);
+            return true;
         }
 
         if(reservedWords.has(this.id2)){
-            throw new Error(`La variable ${id2} es una palabra reservada\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError('Semántico', `La variable ${id2} es una palabra reservada`, node.location.start.line, node.location.start.column);
+            return true;
         }
     
     }
@@ -48,7 +51,8 @@ export class DecArreglos{
 
                 //verificar que la lista de expresiones sea del mismo tipo que el array
                 if(expresiones.tipo != this.tipo){
-                    throw new Error(`Error la lista de expresiones; no es del mismo tipo que el arreglo\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                    registrarError('Semántico', `Error la lista de expresiones; no es del mismo tipo que el arreglo`, node.location.start.line, node.location.start.column);
+                    return {tipo: 'Error', valor: null};
                 }
 
                 this.arregloRetorno.push(expresiones.valor);
@@ -65,12 +69,14 @@ export class DecArreglos{
 
             //verificar que el tipo2 sea igual al tipo
             if(this.tipo != this.tipo2){
-                throw new Error(`Error en la declaración de arreglos, el tipo de dato no coincide con el arreglo\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Error en la declaración de arreglos, el tipo de dato no coincide con el arreglo`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
             }
 
             //verificar que la expresion sea un numero entero y que no sea negativo ni cero
             if(this.exp.tipo != 'int' || this.exp.valor <= 0){
-                throw new Error(`Error en la declaración de arreglos, debe ser un número entero positivo y mayor a cero en el indice\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Error en la declaración de arreglos, debe ser un número entero positivo y mayor a cero en el indice`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
             }
 
             //crear un arreglo con el tamaño de la expresion y el valor por defecto segun el tipo
@@ -96,7 +102,8 @@ export class DecArreglos{
                     return {tipo:this.tipo, valor: arreglo};
 
                 default:
-                    throw new Error(`Tipo de dato no soportado declaracion de arreglo \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                    registrarError('Semántico', `Tipo de dato no soportado declaracion de arreglo`, node.location.start.line, node.location.start.column);
+                    return {tipo: 'Error', valor: null};
             }
 
         }
@@ -107,12 +114,14 @@ export class DecArreglos{
 
             //verificar que el id2 sea del mismo tipo que el arreglo
             if(this.id2.tipo != this.tipo){
-                throw new Error(`Error en la declaración de arreglos, el tipo de dato no coincide con el arreglo\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Error en la declaración de arreglos, el tipo de dato no coincide con el arreglo`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
             }
 
             //si id2 es no iterable, lanzar error
             if(!Array.isArray(this.id2.valor)){
-                throw new Error(`Error en la declaración de arreglos, el valor no es iterable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Error en la declaración de arreglos, el valor no es iterable`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
             }
 
             //crear una copia del arreglo
@@ -123,7 +132,8 @@ export class DecArreglos{
         }
 
         else{
-            throw new Error(`Error en la declaración de arreglos\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError('Semántico', `Error en la declaración de arreglos`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
         }
 
     }

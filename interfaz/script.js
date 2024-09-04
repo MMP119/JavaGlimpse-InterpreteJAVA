@@ -1,5 +1,6 @@
 import { parse } from '../analizador/analizador.js';
 import { InterpreterVisitor} from '../patron/interprete.js';
+import { obtenerErrores, limpiarErrores } from '../global/errores.js';
 
 // Inicializa CodeMirror en el textarea con id 'codeInput'
 var editor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
@@ -51,8 +52,19 @@ document.getElementById('runButton').addEventListener('click', () => {
             ast.accept(interpretacion); // Si es un solo nodo
         }
 
+        let output = interpretacion.salida;
+
+        const erroes = obtenerErrores();
+        if(erroes.length > 0){
+            output += '\n\n====== ERRORES ======\n';
+            erroes.forEach(error => {
+                output += `Error: ${error.mensaje}\nLínea: ${error.linea}, Columna: ${error.columna}\n`;
+            });
+        }
+
         // Mostrar la salida en la consola
-        consoleEditor.setValue(interpretacion.salida);
+        consoleEditor.setValue(output);
+        limpiarErrores();
 
     } catch (e) {
         if (e.name === 'SyntaxError') {

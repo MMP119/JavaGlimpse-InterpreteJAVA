@@ -1,3 +1,5 @@
+import { registrarError } from '../global/errores.js';
+
 export class Aritmetica {
 
     constructor(izq, der, op) {
@@ -38,7 +40,8 @@ export class Aritmetica {
                     return {tipo: 'string', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la suma\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', 'Operación no soportada en la suma', node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
                 
 
             case '-':
@@ -64,7 +67,8 @@ export class Aritmetica {
                     return {tipo:'float', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la resta\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', 'Operación no soportada en la resta', node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
 
 
             case '*':
@@ -90,7 +94,8 @@ export class Aritmetica {
                     return {tipo:'float', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la multiplicacion\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', 'Operación no soportada en la multiplicación', node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
 
 
             case '/':
@@ -140,7 +145,9 @@ export class Aritmetica {
                     return {tipo:'float', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en la division\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', 'Operación no soportada en la división', node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+
 
             case '%':
 
@@ -155,10 +162,12 @@ export class Aritmetica {
                     return {tipo:'int', valor: resultado};
                 }
 
-                throw new Error(`Operación no soportada en modulo\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);           
+                registrarError('Semántico', 'Operación no soportada en el módulo', node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
 
             default:
-                throw new Error(`Operación no soportada \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', 'Operación no soportada', node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
         }
     }
 }

@@ -1,4 +1,4 @@
-// ArrayFunc.js
+import { registrarError } from '../global/errores.js';
 
 export class ArrayFunc {
 
@@ -22,7 +22,8 @@ export class ArrayFunc {
             case 'setElement':
                 return {tipo:'string', valor:'setElement'};
             default:
-                throw new Error(`Función de arreglo no soportada: ${this.method}`);
+                registrarError('Semántico', `Función de arreglo no soportada: ${this.method}`, node.location.start.line, node.location.start.column);
+                return { tipo: 'Error', valor: null };
         }
     }
 
@@ -46,7 +47,8 @@ export class ArrayFunc {
     getElement(node, params) {
         const index = params;
         if (index.valor < 0 || index.valor >= this.arreglo.valor.length) {
-            throw new Error(`Índice fuera de rango en la posición ${index.valor}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}`);
+            registrarError('Semántico', `Índice fuera de rango en la posición ${index.valor}`, node.location.start.line, node.location.start.column);
+            return { tipo: 'Error', valor: null };
         }
         return { tipo: this.arreglo.tipo, valor: this.arreglo.valor[index.valor] };
     }
@@ -57,7 +59,8 @@ export class ArrayFunc {
 
 
         if (index.valor < 0 || index.valor >= this.arreglo.valor.length) {
-            throw new Error(`Índice fuera de rango en la posición ${index.valor}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}`);
+            registrarError('Semántico', `Índice fuera de rango en la posición ${index.valor}`, node.location.start.line, node.location.start.column);
+            return { tipo: 'Error', valor: null };
         }
         this.arreglo.valor[index.valor] = valor.valor;
         return { tipo: this.arreglo.tipo, valor: this.arreglo.valor };

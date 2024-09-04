@@ -1,3 +1,5 @@
+import { registrarError } from '../global/errores.js';
+
 export class Logicas {
 
     constructor(izq, der, op) {
@@ -8,26 +10,35 @@ export class Logicas {
     
     ejecutar(node) {
         switch (this.op) {
+            
             case '&&':
                 if (this.izq.tipo === 'boolean' && this.der.tipo === 'boolean') {
                     const resultado = this.izq.valor && this.der.valor;
                     return { tipo: 'boolean', valor: resultado };
                 }
-                throw new Error(`Operación no soportada en el AND\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en el AND`, node.location.start.line, node.location.start.column);
+                return { tipo: 'Error', valor: null };
+
             case '||':
                 if (this.izq.tipo === 'boolean' && this.der.tipo === 'boolean') {
                     const resultado = this.izq.valor || this.der.valor;
                     return { tipo: 'boolean', valor: resultado };
                 }
-                throw new Error(`Operación no soportada en el OR\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en el OR`, node.location.start.line, node.location.start.column);
+                return { tipo: 'Error', valor: null };
+
             case '!':
                 if (this.izq.tipo === 'boolean') {
                     const resultado = !this.izq.valor;
                     return { tipo: 'boolean', valor: resultado };
                 }
-                throw new Error(`Operación no soportada en el NOT\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operación no soportada en el NOT`, node.location.start.line, node.location.start.column);
+                return { tipo: 'Error', valor: null };
+
             default:
-                throw new Error(`Operador no soportado: ${this.op}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError('Semántico', `Operador no soportado: ${this.op}`, node.location.start.line, node.location.start.column);
+                return { tipo: 'Error', valor: null };
+
         }
     }
 }
