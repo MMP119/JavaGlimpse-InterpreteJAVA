@@ -23,7 +23,7 @@ export class InterpreterVisitor extends BaseVisitor {
 
         // funciones embebidas
         Object.entries(embebidas).forEach(([nombre, funcion]) => {
-            this.entornoActual.setFuncion(nombre, funcion);
+            this.entornoActual.setFuncion(nombre, funcion, "", "");
             //console.log(`Función embebida: ${nombre}`, funcion);  // Imprime para verificar que las funciones están siendo añadidas correctamente
         });
 
@@ -57,7 +57,7 @@ export class InterpreterVisitor extends BaseVisitor {
             const logicas = new Logicas(izq, der, node.op);
             return logicas.ejecutar(node);
         } else {
-            registrarError(`Operador desconocido: ${node.op}`, node.location.start.line, node.location.start.column);
+            registrarError("Semantico",`Operador desconocido: ${node.op}`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
     }
@@ -130,7 +130,7 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const {tipo, valor} = declararVariable.asignar(node);
 
-        this.entornoActual.setVariable(nombreVariable, {tipo, valor});
+        this.entornoActual.setVariable(nombreVariable, {tipo, valor}, node.location.start.line, node.location.start.column);
 
     }
 
@@ -149,7 +149,8 @@ export class InterpreterVisitor extends BaseVisitor {
         let expresion = null;
         if(Array.isArray(node.exp)){
             expresion = node.exp;
-        }else{
+        }
+        if(!Array.isArray(node.exp) && node.exp != null){
             expresion = node.exp.accept(this);
         }
 
@@ -163,7 +164,7 @@ export class InterpreterVisitor extends BaseVisitor {
         const {tipo, valor} = declararArreglo.declarar(node);
         //console.log(valor[3]); //prueba de impresion de un valor de un arreglo en una posicion especifica
         
-        this.entornoActual.setVariable(idArreglo1, {tipo, valor});
+        this.entornoActual.setVariable(idArreglo1, {tipo, valor}, node.location.start.line, node.location.start.column);
 
     }
 
@@ -174,12 +175,12 @@ export class InterpreterVisitor extends BaseVisitor {
         const id = node.id;
         
         //buscar el arreglo en el entorno
-        const arreglo = this.entornoActual.getVariable(id);
+        const arreglo = this.entornoActual.getVariable(id, node.location.start.line, node.location.start.column);
 
         //si no existe el arreglo
         if(!arreglo){
             //throw new Error(`El arreglo '${id}' no existe en el entorno actual\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError(`El arreglo '${id}' no existe en el entorno actual`, node.location.start.line, node.location.start.column);
+            registrarError("Semantico",`El arreglo '${id}' no existe en el entorno actual`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
 
@@ -219,7 +220,7 @@ export class InterpreterVisitor extends BaseVisitor {
       */
     visitReferenciaVariable(node) {
         const nombreVariable = node.id;
-        const valores = this.entornoActual.getVariable(nombreVariable);
+        const valores = this.entornoActual.getVariable(nombreVariable, node.location.start.line, node.location.start.column);
         return valores;
     }
 
@@ -280,10 +281,10 @@ export class InterpreterVisitor extends BaseVisitor {
 
         if (!autorizacion){
             //throw new Error(`No se pueden asignar tipos de datos diferentes a la variable ${node.id}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError(`No se pueden asignar tipos de datos diferentes a la variable ${node.id}`, node.location.start.line, node.location.start.column);
+            registrarError("Semantico",`No se pueden asignar tipos de datos diferentes a la variable ${node.id}`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
-        this.entornoActual.assignVariable(node.id, valor);
+        this.entornoActual.assignVariable(node.id, valor, node.location.start.line, node.location.start.column);
 
         return valor;
     }
@@ -320,7 +321,7 @@ export class InterpreterVisitor extends BaseVisitor {
         //verificar que la condicion sea un booleano
         if (cond.tipo !== 'boolean') {
             //throw new Error(`Semantico; La condición del if debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError(`La condición del if debe ser de tipo booleano`, node.location.start.line, node.location.start.column);
+            registrarError("Semantico",`La condición del if debe ser de tipo booleano`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
 
@@ -360,7 +361,7 @@ export class InterpreterVisitor extends BaseVisitor {
             //verificar que la condicion sea un booleano
             if (node.cond.accept(this).tipo !== 'boolean') {
                 //throw new Error(`Semantico; La condición del while debe ser de tipo booleano\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-                registrarError(`La condición del while debe ser de tipo booleano`, node.location.start.line, node.location.start.column);
+                registrarError("Semantico",`La condición del while debe ser de tipo booleano`, node.location.start.line, node.location.start.column);
                 return {tipo: 'Error', valor: null};
             }
 
@@ -512,18 +513,18 @@ export class InterpreterVisitor extends BaseVisitor {
      */
     visitLlamada(node) {
         const nombreFuncion = node.callee.id;
-        const funcion = this.entornoActual.getFuncion(nombreFuncion);
+        const funcion = this.entornoActual.getFuncion(nombreFuncion, node.location.start.line, node.location.start.column);
         const argumentos = node.args.map(arg => arg.accept(this));
     
         if (!(funcion instanceof Invocable)) {
             //throw new Error(`La variable '${nombreFuncion}' no es invocable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError(`La variable '${nombreFuncion}' no es invocable`, node.location.start.line, node.location.start.column);
+            registrarError("Semantico",`La variable '${nombreFuncion}' no es invocable`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
     
         if (funcion.aridad() !== argumentos.length) {
             //throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError(`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
+            registrarError("Semantico",`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
     

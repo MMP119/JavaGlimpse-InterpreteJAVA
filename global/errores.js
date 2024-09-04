@@ -1,8 +1,8 @@
 
 let errores = [];
 
-export function registrarError(mensaje, linea, columna) {
-    errores.push({ mensaje, linea, columna });
+export function registrarError(tipo,mensaje, linea, columna) {
+    errores.push({tipo,mensaje, linea, columna });
 }
 
 export function obtenerErrores() {
@@ -24,6 +24,7 @@ export function obtenerErroresHTML() {
 
     errores.forEach(error => {
         html += "<tr>";
+        html += `<td>${error.tipo}</td>`;
         html += `<td>${error.mensaje}</td>`;
         html += `<td>${error.linea}</td>`;
         html += `<td>${error.columna}</td>`;

@@ -15,10 +15,10 @@ export class Entorno {
      * @param {string} nombre
      * @param {any} valor
      */
-    setVariable(nombre, {tipo, valor}) {
+    setVariable(nombre, {tipo, valor}, fila, columna) {
         // TODO: si algo ya está definido, lanzar error
         if(this.valores.hasOwnProperty(nombre)){
-            registrarError("Semantico: Variable ya definida", "", "");
+            registrarError("Semantico", `Variable ${nombre} ya definida`, fila, columna); 
             return{tipo: 'Error', valor: null};
         }
         this.valores[nombre] = {tipo, valor};
@@ -27,7 +27,7 @@ export class Entorno {
     /**
      * @param {string} nombre
      */
-    getVariable(nombre) {
+    getVariable(nombre, fila, columna) {
         const valorActual = this.valores[nombre];
 
         if (valorActual !== undefined) return valorActual;
@@ -37,21 +37,21 @@ export class Entorno {
         }
 
         //throw new Error(`Variable ${nombre} no definida`); 
-        registrarError("Semantico: Variable no definida", "", "");
+        registrarError("Semantico",`Variable ${nombre} no definida`, fila, columna);
         return{tipo: 'Error', valor: null};
     }
 
     //para las funciones embebidas
-    setFuncion(nombre, funcion) {
+    setFuncion(nombre, funcion, fila, columna) {
         if (this.funciones.hasOwnProperty(nombre)) {
             //throw new Error(`Función ${nombre} ya definida`);
-            registrarError("Semantico: Función ya definida", "", "");
+            registrarError("Semantico",`Funcion ${nombre} ya definida`, fila, columna);
             return;
         }
         this.funciones[nombre] = funcion;
     }
 
-    getFuncion(nombre) {
+    getFuncion(nombre, fila, columna) {
         const funcionActual = this.funciones[nombre];
 
         if (funcionActual !== undefined) return funcionActual;
@@ -61,7 +61,7 @@ export class Entorno {
         }
 
         //throw new Error(`Función ${nombre} no definida`);
-        registrarError("Semantico: Función no definida", "", "");
+        registrarError("Semantico",`Funcion ${nombre} no definida`, fila, columna);
         return;
     }
 
@@ -69,7 +69,7 @@ export class Entorno {
    * @param {string} nombre
    * @param {any} valor
    */
-    assignVariable(nombre, valor) {
+    assignVariable(nombre, valor, fila, columna) {
         const valorActual = this.valores[nombre];
 
         if (valorActual !== undefined) {
@@ -83,7 +83,7 @@ export class Entorno {
         }
 
         //throw new Error(`Variable ${nombre} no definida`);
-        registrarError("Semantico: Variable no definida", "", "");
+        registrarError("Semantico",`Variable ${nombre} no definida`, fila, columna);
         return{tipo: 'Error', valor: null};
     }
 }

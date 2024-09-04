@@ -23,7 +23,7 @@ export class DecVariables {
         ]);
     
         if(reservedWords.has(this.id)){
-            registrarError("Semantico: Variable con nombre de palabra reservada", node.location.start.line, node.location.start.column);
+            registrarError("Semantico", "Variable con nombre de palabra reservada", node.location.start.line, node.location.start.column);
             return true;
         }
     
@@ -55,7 +55,7 @@ export class DecVariables {
                 this.exp = {tipo: this.tipo, valor: ''};
             }
             else{
-                registrarError("Semantico: Tipo de dato no soportado", node.location.start.line, node.location.start.column);
+                registrarError("Semantico", "Tipo de dato no soportado", node.location.start.line, node.location.start.column);
                 return {
                     tipo: 'Error',
                     valor: null
@@ -79,7 +79,7 @@ export class DecVariables {
                             valor: this.exp.valor
                         }
                     }else{
-                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un int", node.location.start.line, node.location.start.column);
+                        registrarError("Semantico","Tipo de dato incorrecto en la variable, se esperaba un int", node.location.start.line, node.location.start.column);
                         return {
                             tipo: 'Error',
                             valor: null
@@ -96,7 +96,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un float", node.location.start.line, node.location.start.column);
+                        registrarError("Semantico", "Tipo de dato incorrecto en la variable, se esperaba un float", node.location.start.line, node.location.start.column);
                         return {
                             tipo: 'Error',
                             valor: null
@@ -112,7 +112,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un string", node.location.start.line, node.location.start.column);
+                        registrarError("Semantico", " Tipo de dato incorrecto en la variable, se esperaba un string", node.location.start.line, node.location.start.column);
                         return {
                             tipo: 'Error',
                             valor: null
@@ -128,7 +128,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un boolean", node.location.start.line, node.location.start.column);
+                        registrarError("Semantico", " Tipo de dato incorrecto en la variable, se esperaba un boolean", node.location.start.line, node.location.start.column);
                         return {
                             tipo: 'Error',
                             valor: null
@@ -144,7 +144,7 @@ export class DecVariables {
                         }
                     }
                     else{
-                        registrarError("Semantico: Tipo de dato incorrecto en la variable, se esperaba un char", node.location.start.line, node.location.start.column);
+                        registrarError("Semantico", "Tipo de dato incorrecto en la variable, se esperaba un char", node.location.start.line, node.location.start.column);
                         return {
                             tipo: 'Error',
                             valor: null
@@ -187,7 +187,7 @@ export class DecVariables {
                             }
 
                         default:
-                            registrarError("Semantico: Tipo de dato no soportado en variable con var", node.location.start.line, node.location.start.column);
+                            registrarError("Semantico", " Tipo de dato no soportado en variable con var", node.location.start.line, node.location.start.column);
                             return {
                                 tipo: 'Erorr',
                                 valor: null
