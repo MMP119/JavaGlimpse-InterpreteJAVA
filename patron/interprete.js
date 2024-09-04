@@ -415,6 +415,56 @@ export class InterpreterVisitor extends BaseVisitor {
     }
 
 
+    /**
+     * @type {BaseVisitor['visitForeach']}
+     */
+    visitForeach(node){
+        const entornoAnterior = this.entornoActual;
+
+        try{
+
+            //obtener el arreglo que se va a recorrer
+            const arreglo = node.id2.accept(this);
+
+            //verificar que el arreglo sea un arreglo unidiemensional
+            if(!Array.isArray(arreglo.valor)){
+                //throw new Error(`Semantico; El objeto a recorrer debe ser un arreglo\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError("Semantico",`El objeto a recorrer debe ser un arreglo unidimensional`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            }
+
+            //verificar que el tipo de dato del arreglo sea el mismo que el tipo de dato de la variable
+            const tipoDato = node.tipo;
+            const tipoArreglo = arreglo.tipo;
+
+            if(tipoDato !== tipoArreglo){
+                //throw new Error(`Semantico; El tipo de dato del arreglo es diferente al tipo de dato de la variable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+                registrarError("Semantico",`El tipo de dato del arreglo es diferente al tipo de dato de la variable`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            }
+
+            //implementar el foreach
+            for(const valor of arreglo.valor){
+                this.entornoActual = new Entorno(entornoAnterior);
+                this.entornoActual.setVariable(node.id, {tipo: tipoDato, valor}, node.location.start.line, node.location.start.column); //agregar la variable al entorno
+                node.stmt.accept(this);
+            }
+
+        }catch(e){
+        
+            this.entornoActual = entornoAnterior;
+            if(e instanceof ExcepcionBrake){
+                return;
+            }
+
+            if(e instanceof ExcepcionContinue){
+                return this.visitForeach(node);
+            }
+
+            throw e;
+        }
+
+    }
 
     /**
      * @type {BaseVisitor['visitSwitch']}

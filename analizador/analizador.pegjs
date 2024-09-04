@@ -17,6 +17,7 @@
         'cadena': nodos.Cadena,
         'booleano': nodos.Booleano,
         "for": nodos.For,
+        "foreach": nodos.Foreach,
         "break": nodos.Break,
         "continue": nodos.Continue,
         "return": nodos.Return,
@@ -79,6 +80,9 @@ Stmt = "System.out.println(" _ exp:ExpresionConComa _ ")" _ ";" { return crearNo
     / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt { return crearNodo('while', { cond, stmt }) }
 
     / "for" _ "(" _ init: ForInit _ cond:Expresion _ ";" _ inc:Expresion _ ")" _ stmt: Stmt {return crearNodo('for', { init, cond, inc, stmt })}
+
+    // foreach, solo recorre areglo uni-dimensional
+    / "for" _ "(" _  tipo:TiposDatosPrimitivos _ id:Identificador _ ":" _ id2:Expresion _ ")" _ stmt: Stmt {return crearNodo('foreach', { tipo, id, id2, stmt })}
     
     / "break" _ ";" { return crearNodo('break') }
 

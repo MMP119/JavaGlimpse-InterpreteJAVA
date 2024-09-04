@@ -536,6 +536,55 @@ export class For extends Expresion {
     }
 }
     
+export class Foreach extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de dato
+ * @param {string} options.id Identificador de la variable
+ * @param {Expresion} options.id2 Identificador del arreglo
+ * @param {Expresion} options.stmt Cuerpo del foreach
+    */
+    constructor({ tipo, id, id2, stmt }) {
+        super();
+        
+        /**
+         * Tipo de dato
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la variable
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id2 = id2;
+
+
+        /**
+         * Cuerpo del foreach
+         * @type {Expresion}
+        */
+        this.stmt = stmt;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitForeach(this);
+    }
+}
+    
 export class Break extends Expresion {
 
     /**
@@ -812,4 +861,4 @@ export class ArrayFunc extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, ArrayFunc }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, ArrayFunc }
