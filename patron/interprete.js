@@ -13,6 +13,7 @@ import {Logicas} from '../expresiones/logicas.js';
 import {Unaria} from '../expresiones/Unaria.js';
 import {AsigVariables} from '../expresiones/asigVariables.js';
 import {ArrayFunc} from '../expresiones/arrayFunc.js';
+import { DecMatriz } from '../expresiones/decMatriz.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -159,7 +160,7 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const declararArreglo = new DecArreglos(tipoArreglo1, idArreglo1, expresion, tipoArreglo2, idArreglo2);
 
-        declararArreglo.verificarReservada(node, idArreglo1, idArreglo2);
+        if(declararArreglo.verificarReservada(node, idArreglo1, idArreglo2)) return;
 
         const {tipo, valor} = declararArreglo.declarar(node);
         //console.log(valor[3]); //prueba de impresion de un valor de un arreglo en una posicion especifica
@@ -167,6 +168,70 @@ export class InterpreterVisitor extends BaseVisitor {
         this.entornoActual.setVariable(idArreglo1, {tipo, valor}, node.location.start.line, node.location.start.column);
 
     }
+
+
+
+    /**
+     * @type {BaseVisitor['visitDeclaracionMatriz']}
+     */
+    visitDeclaracionMatriz(node){
+        console.log(node);
+        const idMatriz = node.id;
+
+        //verificar si exp y expN es un arreglo
+        let exp = null;
+        let expN = null;
+
+        if(!Array.isArray(node.exp) && Array.isArray(node.expN)){ //son numeros entonces es una matriz con tamaño definido,  int [][] mtz = new int [numero][numero]
+            exp = node.exp
+            expN = node.expN
+
+            if(exp.tipo != 'int'){
+                registrarError("Semantico",`Los valores de la matriz deben ser de tipo entero`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            }
+
+            //ahora verificar para expN que es un arreglo de numeros
+            for(const expresion of expN){
+                if(expresion.tipo != 'int'){
+                    registrarError("Semantico",`Los valores de la matriz deben ser de tipo entero`, node.location.start.line, node.location.start.column);
+                    return {tipo: 'Error', valor: null};
+                }
+            }
+
+            if(exp.valor <= 0 ){
+                registrarError("Semantico",`Los valores de la matriz deben ser mayores a cero`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            }
+
+            for(const expresion of expN){
+                if(expresion.valor <= 0){
+                    registrarError("Semantico",`Los valores de la matriz deben ser mayores a cero`, node.location.start.line, node.location.start.column);
+                    return {tipo: 'Error', valor: null};
+                }
+            }
+
+            if(node.tipo != node.tipo2){
+                registrarError("Semantico",`El tipo de dato de la matriz es diferente al tipo de dato que se quiere implementar en la matriz`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            }
+
+            const declararMatriz = new DecMatriz(node.tipo, idMatriz, exp, expN, node.tipo2);
+            if(declararMatriz.verificarReservada(node, idMatriz)) return;
+
+            const {tipo, valor} = declararMatriz.declararMatriz(node);
+
+            this.entornoActual.setVariable(idMatriz, {tipo, valor}, node.location.start.line, node.location.start.column);
+
+
+        }else{
+            
+        }
+        
+    }
+
+
+
 
     /**
       * @type {BaseVisitor['visitArrayFunc']}
@@ -225,39 +290,59 @@ export class InterpreterVisitor extends BaseVisitor {
     }
 
 
-    /**
-     * @type {BaseVisitor['visitPrint']}
-     */
-    visitPrint(node) {
+/**
+ * @type {BaseVisitor['visitPrint']}
+ */
+visitPrint(node) {
 
-        // Crear una variable temporal para almacenar los resultados antes de agregarlos a la salida
-        let resultado = "";
+    // Crear una variable temporal para almacenar los resultados antes de agregarlos a la salida
+    let resultado = "";
 
-        // Recorrer el array de expresiones
-        node.exp.forEach((exp, index) => {
-            const valor = exp.accept(this);
+    // Recorrer el array de expresiones
+    node.exp.forEach((exp, index) => {
+        const valor = exp.accept(this);
 
-            // Si el valor es null, manejar el caso de división por 0
-            if (valor.tipo === null && valor.valor === null) {
-                this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
+        // Si el valor es null, manejar el caso de división por 0
+        if (valor.tipo === null && valor.valor === null) {
+            this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
+        } else {
+            // Verificar si el valor es una matriz o array
+            if (Array.isArray(valor.valor)) {
+                // Crear una función recursiva para extraer solo los valores numéricos
+                const extraerValores = (arr) => {
+                    return arr.map(elemento => {
+                        if (Array.isArray(elemento)) {
+                            // Si el elemento es un array, hacer la llamada recursiva
+                            return extraerValores(elemento);
+                        } else if (elemento && elemento.hasOwnProperty('valor')) {
+                            // Si es un objeto con la propiedad 'valor', extraer solo el valor
+                            return elemento.valor;
+                        }
+                        return elemento;  // En caso de no ser un objeto esperado
+                    });
+                };
+
+                // Usar la función para obtener solo los valores numéricos
+                const valoresExtraidos = extraerValores(valor.valor);
+
+                // Convertir a string solo los valores extraídos
+                resultado += JSON.stringify(valoresExtraidos);
             } else {
-                // Usar JSON.stringify si es un array, o concatenar directamente si es otro tipo de valor
-                if (Array.isArray(valor.valor)) {
-                    resultado += JSON.stringify(valor.valor);
-                } else {
-                    resultado += valor.valor;
-                }
+                // Para otros tipos de valores (no arrays), concatenar directamente
+                resultado += valor.valor;
             }
+        }
 
-            // Solo agregar un espacio si no es el último valor
-            if (index < node.exp.length - 1) {
-                resultado += " ";
-            }
-        });
+        // Solo agregar un espacio si no es el último valor
+        if (index < node.exp.length - 1) {
+            resultado += " ";
+        }
+    });
 
-        // Agregar el resultado con un salto de línea al final
-        this.salida += resultado + '\n';
-    }
+    // Agregar el resultado con un salto de línea al final
+    this.salida += resultado + '\n';
+}
+
 
 
 

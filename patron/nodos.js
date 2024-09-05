@@ -820,6 +820,63 @@ export class DeclaracionArreglo extends Expresion {
     }
 }
     
+export class DeclaracionMatriz extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de la matriz
+ * @param {string} options.id Identificador de la matriz
+ * @param {Expresion} options.exp Expresion de la matriz1
+ * @param {Expresion} options.expN Expresion de la matrizN, arreglo de arreglos
+ * @param {string} options.tipo2 Tipo de la matriz2
+    */
+    constructor({ tipo, id, exp, expN, tipo2 }) {
+        super();
+        
+        /**
+         * Tipo de la matriz
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la matriz
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Expresion de la matriz1
+         * @type {Expresion}
+        */
+        this.exp = exp;
+
+
+        /**
+         * Expresion de la matrizN, arreglo de arreglos
+         * @type {Expresion}
+        */
+        this.expN = expN;
+
+
+        /**
+         * Tipo de la matriz2
+         * @type {string}
+        */
+        this.tipo2 = tipo2;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionMatriz(this);
+    }
+}
+    
 export class ArrayFunc extends Expresion {
 
     /**
@@ -861,4 +918,4 @@ export class ArrayFunc extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, ArrayFunc }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, DeclaracionMatriz, ArrayFunc }
