@@ -78,6 +78,9 @@
 
  * @typedef {import('./nodos').ArrayFunc} ArrayFunc
 
+
+ * @typedef {import('./nodos').MatrizFunc} MatrizFunc
+
  */
 
 
@@ -319,6 +322,15 @@ export class BaseVisitor {
      */
     visitArrayFunc(node) {
         throw new Error('Metodo visitArrayFunc no implementado');
+    }
+    
+
+    /**
+     * @param {MatrizFunc} node
+     * @returns {any}
+     */
+    visitMatrizFunc(node) {
+        throw new Error('Metodo visitMatrizFunc no implementado');
     }
     
 }

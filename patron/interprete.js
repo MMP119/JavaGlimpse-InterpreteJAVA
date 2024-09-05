@@ -14,6 +14,7 @@ import {Unaria} from '../expresiones/Unaria.js';
 import {AsigVariables} from '../expresiones/asigVariables.js';
 import {ArrayFunc} from '../expresiones/arrayFunc.js';
 import { DecMatriz } from '../expresiones/decMatriz.js';
+import { MatrizFunc } from '../expresiones/matrizFunc.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -236,8 +237,27 @@ export class InterpreterVisitor extends BaseVisitor {
         
     }
 
+    /**
+      * @type {BaseVisitor['visitMatrizFunc']}
+      */
+    visitMatrizFunc(node){
+        const id = node.id;
+        const method = node.method;
+        const indices = node.indexs;
+        const value = node.value ? node.value.accept(this): null;
 
+        const matriz = this.entornoActual.getVariable(id, node.location.start.line, node.location.start.column);
 
+        if(!matriz){
+            //throw new Error(`La matriz '${id}' no existe en el entorno actual\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError("Semantico",`La matriz '${id}' no existe en el entorno actual`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        }
+
+        const matrizFunc = new MatrizFunc(matriz, method, indices, value);
+        return matrizFunc.ejecutar(node);
+
+    }
 
     /**
       * @type {BaseVisitor['visitArrayFunc']}

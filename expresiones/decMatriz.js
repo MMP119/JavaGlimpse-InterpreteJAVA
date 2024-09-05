@@ -78,17 +78,17 @@ export class DecMatriz{
     getValorPorDefecto(tipo) {
         switch (tipo) {
             case 'int':
-                return 0;
+                return {tipo: 'int', valor: 0};
             case 'float':
-                return 0.0;
+                return {tipo: 'float', valor: 0.0};
             case 'string':
-                return "";
+                return {tipo: 'string', valor: ""};
             case 'boolean':
-                return false;
+                return {tipo: 'boolean', valor: false};
             case 'char':
-                return '\u0000';
+                return {tipo: 'char', valor: ''};
             default:
-                return null; // Para tipos desconocidos
+                return {tipo: 'Error', valor: null};
         }
     }
 

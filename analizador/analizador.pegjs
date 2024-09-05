@@ -26,8 +26,8 @@
         "switch": nodos.Switch,
         "declaracionArreglo": nodos.DeclaracionArreglo,
         "arrayFunc": nodos.ArrayFunc,
-        "declaracionMatriz": nodos.DeclaracionMatriz
-
+        "declaracionMatriz": nodos.DeclaracionMatriz,
+        "matrizFunc": nodos.MatrizFunc,
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -78,15 +78,13 @@ DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresio
 
 MatrizValores = _ "{" _ elementos:ElementosAnidados _ "}" {return elementos}
 
-ElementosAnidados = primer:MatrizElemento _ siguiente:("," _ siguienteElem:MatrizElemento {return siguienteElem})* {
-        return [primer,...siguiente];
-}
+ElementosAnidados = primer:MatrizElemento _ siguiente:("," _ siguienteElem:MatrizElemento {return siguienteElem})* {return [primer,...siguiente];}
 
 MatrizElemento = "{" _ valores:ElementosAnidados _ "}" {return valores}
         / valor: Expresion {return valor}
 
-
 ExpresionConComa = exp:Expresion _ coma:("," _ exp2:Expresion{return exp2})* { return [exp, ...coma] } //para las expresiones con coma
+
 
 
 // steatements NO DECLARATIVOS, es decir, que no declaran variables
@@ -266,8 +264,15 @@ Datos =  "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
 ArrayFunc = id:Identificador _ "." _ method:("indexOf"/"join"/"length") _ exp:("(" _  exp:Expresion? _ ")" {return exp})? {return crearNodo('arrayFunc', { id, method, exp })} 
     
     / id:Identificador _ "[" _ index:Expresion _ "]" _ "=" _ value:Expresion      {return crearNodo('arrayFunc', { id, method:'setElement', exp:[index, value]});} 
+    
+    / id:Identificador _ "[" _ index: Expresion "]" _  indices:("[" _ index1: Expresion _ "]"{return index1})+ _ "=" _ value:Expresion {return crearNodo('matrizFunc', { id, method:'setElement', indexs:[index, ...indices], value});} 
+    
+    / id:Identificador _ "[" _ index: Expresion "]" _  indices:("[" _ index1: Expresion _ "]"{return index1})+ {const value = null; return crearNodo('matrizFunc', { id, method:'getElement', indexs:[index, ...indices], value});}
 
     / id:Identificador _ "[" _ index:Expresion _ "]"                          {const value = null; return crearNodo('arrayFunc', { id, method:'getElement', exp:[index,value]});} 
+
+    //ahora asignacion de valores a las matrices
+
 
 
 NumeroEntero = [0-9]+//( "." [0-9]+ )? 

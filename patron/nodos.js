@@ -918,4 +918,53 @@ export class ArrayFunc extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, DeclaracionMatriz, ArrayFunc }
+export class MatrizFunc extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.id Identificador de la matriz
+ * @param {string} options.method método que se va a ejecutar
+ * @param {Expresion} options.indexs expresion, indice o valor
+ * @param {Expresion} options.value expresion que se va a asignar
+    */
+    constructor({ id, method, indexs, value }) {
+        super();
+        
+        /**
+         * Identificador de la matriz
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * método que se va a ejecutar
+         * @type {string}
+        */
+        this.method = method;
+
+
+        /**
+         * expresion, indice o valor
+         * @type {Expresion}
+        */
+        this.indexs = indexs;
+
+
+        /**
+         * expresion que se va a asignar
+         * @type {Expresion}
+        */
+        this.value = value;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitMatrizFunc(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, DeclaracionMatriz, ArrayFunc, MatrizFunc }
