@@ -226,7 +226,11 @@ export class InterpreterVisitor extends BaseVisitor {
 
         }else{
 
-            console.log(node);
+            const declararMatriz = new DecMatriz(node.tipo, idMatriz, node.exp, node.expN, node.tipo2);
+            if(declararMatriz.verificarReservada(node, idMatriz)) return;
+
+            const {tipo, valor} = declararMatriz.declararMatriz(node);
+            this.entornoActual.setVariable(idMatriz, {tipo, valor}, node.location.start.line, node.location.start.column);
             
         }
         

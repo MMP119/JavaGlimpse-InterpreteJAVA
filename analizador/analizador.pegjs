@@ -78,10 +78,12 @@ DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresio
 
 MatrizValores = _ "{" _ elementos:ElementosAnidados _ "}" {return elementos}
 
-ElementosAnidados = _ primer:MatrizElemento _ siguiente:("," _ siguienteElem:MatrizElemento {return siguienteElem})* {return [primer].concat(siguiente);}
+ElementosAnidados = primer:MatrizElemento _ siguiente:("," _ siguienteElem:MatrizElemento {return siguienteElem})* {
+        return [primer,...siguiente];
+}
 
 MatrizElemento = "{" _ valores:ElementosAnidados _ "}" {return valores}
-        / ExpresionConComa
+        / valor: Expresion {return valor}
 
 
 ExpresionConComa = exp:Expresion _ coma:("," _ exp2:Expresion{return exp2})* { return [exp, ...coma] } //para las expresiones con coma

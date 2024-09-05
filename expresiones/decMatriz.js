@@ -39,9 +39,12 @@ export class DecMatriz{
         //verificar si tipo2M es null, entonces es una matriz con valores de inicializacion
         if(this.tipo2 ==null){
 
+
+            let matriz = this.exp;
             
-
-
+            // Verifica el valor específico
+            //console.log(`Valor en matriz[0][0][0]: ${matriz[1][0][1].valor}`); // Debería imprimir 1
+            return { tipo: this.tipo, valor: matriz };
 
         }else{ //es una matriz con un tamaño especifico, exp = num y expN = arreglo de num
 
