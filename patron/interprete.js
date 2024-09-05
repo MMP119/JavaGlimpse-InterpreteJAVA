@@ -175,7 +175,7 @@ export class InterpreterVisitor extends BaseVisitor {
      * @type {BaseVisitor['visitDeclaracionMatriz']}
      */
     visitDeclaracionMatriz(node){
-        console.log(node);
+
         const idMatriz = node.id;
 
         //verificar si exp y expN es un arreglo
@@ -225,6 +225,8 @@ export class InterpreterVisitor extends BaseVisitor {
 
 
         }else{
+
+            console.log(node);
             
         }
         

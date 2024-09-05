@@ -59,6 +59,7 @@ DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresio
             //declaracion cuadno es una copia de otro array
             /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ id2:Expresion _ ";" {const exp = null; const tipo2 = null;return crearNodo('declaracionArreglo',{tipo, id, exp, tipo2, id2})}
 
+
             //declaracion e inicializacion de una matriz directamente por ejemplo int [][][] matriz = {{1,2,3},{4,5,6},{7,8,9}};            
             /tipo:TiposDatosPrimitivos _ "[" _ "]" _ ("[" _ "]")+ _ id:Identificador _ "=" _ exp:MatrizValores _ ";" {
 
@@ -75,9 +76,12 @@ DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresio
                 }
 
 
-MatrizValores = "{" _ elementos:ElementosAnidados _ "}"
+MatrizValores = _ "{" _ elementos:ElementosAnidados _ "}" {return elementos}
 
-ElementosAnidados = primer:ExpresionConComa siguiente:("," _ "{" _ expN:ExpresionConComa _ "}")* {return [primer].concat(siguiente.map(s => s[2]));}
+ElementosAnidados = _ primer:MatrizElemento _ siguiente:("," _ siguienteElem:MatrizElemento {return siguienteElem})* {return [primer].concat(siguiente);}
+
+MatrizElemento = "{" _ valores:ElementosAnidados _ "}" {return valores}
+        / ExpresionConComa
 
 
 ExpresionConComa = exp:Expresion _ coma:("," _ exp2:Expresion{return exp2})* { return [exp, ...coma] } //para las expresiones con coma
