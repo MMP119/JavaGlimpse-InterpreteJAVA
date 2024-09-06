@@ -7,7 +7,8 @@ export class Entorno {
      */
     constructor(padre = undefined) {
         this.valores = {};
-        this.funciones = {}; // para implementar las funciones embebidas
+        this.funcionesEmbebidas = {}; // para implementar las funciones embebidas
+        this.funciones = {};
         this.padre = padre;
     }
 
@@ -41,14 +42,14 @@ export class Entorno {
         return{tipo: 'Error', valor: null};
     }
 
-    //para las funciones embebidas
-    setFuncion(nombre, funcion, fila, columna) {
+    //para las funciones
+    setFuncion(nombre, {tipo, valor}, fila, columna) {
         if (this.funciones.hasOwnProperty(nombre)) {
             //throw new Error(`Función ${nombre} ya definida`);
             registrarError("Semantico",`Funcion ${nombre} ya definida`, fila, columna);
             return;
         }
-        this.funciones[nombre] = funcion;
+        this.funciones[nombre] = {tipo, valor};
     }
 
     getFuncion(nombre, fila, columna) {
@@ -56,10 +57,9 @@ export class Entorno {
 
         if (funcionActual !== undefined) return funcionActual;
 
-        if (this.padre) {
+        if (!funcionActual && this.padre) {
             return this.padre.getFuncion(nombre);
         }
-
         //throw new Error(`Función ${nombre} no definida`);
         registrarError("Semantico",`Funcion ${nombre} no definida`, fila, columna);
         return;

@@ -26,8 +26,10 @@ export class InterpreterVisitor extends BaseVisitor {
 
         // funciones embebidas
         Object.entries(embebidas).forEach(([nombre, funcion]) => {
-            this.entornoActual.setFuncion(nombre, funcion, "", "");
-            //console.log(`Función embebida: ${nombre}`, funcion);  // Imprime para verificar que las funciones están siendo añadidas correctamente
+            let tipo = funcion.invocar().tipo;
+            let valor = funcion.invocar().valor;
+            this.entornoActual.setFuncion(nombre, {tipo:tipo, valor:valor}, "", "");
+            console.log(`Función embebida: ${nombre}`, funcion);  // Imprime para verificar que las funciones están siendo añadidas correctamente
         });
 
         //para los errores
@@ -703,14 +705,8 @@ visitPrint(node) {
      */
     visitLlamada(node) {
         const nombreFuncion = node.callee.id;
-        const funcion = this.entornoActual.getVariable(nombreFuncion, node.location.start.line, node.location.start.column);
+        const funcion = this.entornoActual.getFuncion(nombreFuncion, node.location.start.line, node.location.start.column);
         const argumentos = node.args.map(arg => arg.accept(this));
-    
-        if (!(funcion.valor instanceof Invocable)) {
-            //throw new Error(`La variable '${nombreFuncion}' no es invocable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError("Semantico",`La funcion '${nombreFuncion}' no es invocable`, node.location.start.line, node.location.start.column);
-            return {tipo: 'Error', valor: null};
-        }
     
         if (funcion.valor.aridad() !== argumentos.length) {
             //throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
@@ -731,7 +727,7 @@ visitPrint(node) {
 
         if(funcion.verificarReservada(node, node.id))return;
 
-        this.entornoActual.setVariable(node.id, {tipo: node.tipo, valor: funcion}, node.location.start.line, node.location.start.column);
+        this.entornoActual.setFuncion(node.id, {tipo: node.tipo, valor: funcion}, node.location.start.line, node.location.start.column);
     }
 
 }
