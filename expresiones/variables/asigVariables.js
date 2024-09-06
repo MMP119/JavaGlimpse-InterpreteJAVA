@@ -1,4 +1,4 @@
-import { Entorno } from "../patron/entorno.js";
+import { Entorno } from "../../patron/entorno.js";
 
 export class AsigVariables{
 

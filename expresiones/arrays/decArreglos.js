@@ -1,5 +1,5 @@
-import { Entorno } from "../patron/entorno.js";
-import { registrarError } from '../global/errores.js';
+import { Entorno } from "../../patron/entorno.js";
+import { registrarError } from '../../global/errores.js';
 
 export class DecArreglos{
 

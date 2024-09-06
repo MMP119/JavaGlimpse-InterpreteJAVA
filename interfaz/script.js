@@ -1,6 +1,6 @@
 import { parse } from '../analizador/analizador.js';
 import { InterpreterVisitor} from '../patron/interprete.js';
-import { obtenerErrores, limpiarErrores } from '../global/errores.js';
+import { obtenerErrores, limpiarErrores, obtenerErroresHTML } from '../global/errores.js';
 
 // Inicializa CodeMirror en el textarea con id 'codeInput'
 var editor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
@@ -38,6 +38,8 @@ document.getElementById('openButton').addEventListener('click', function() {
 
 // función para el botón 'Run'
 document.getElementById('runButton').addEventListener('click', () => {
+
+    limpiarErrores(); // Limpiar errores anteriores
     const code = editor.getValue();
 
     try {
@@ -63,8 +65,7 @@ document.getElementById('runButton').addEventListener('click', () => {
         }
 
         // Mostrar la salida en la consola
-        consoleEditor.setValue(output);
-        limpiarErrores();
+        consoleEditor.setValue(output);        
 
     } catch (e) {
         if (e.name === 'SyntaxError') {
@@ -131,8 +132,7 @@ document.getElementById('saveButton').addEventListener('click', function() {
 
 //para el erroresButton
 document.getElementById('erroresButton').addEventListener('click', function() {
-
-
+    obtenerErroresHTML();
 });
 
 

@@ -1,7 +1,7 @@
 //clase para definir todo lo que pueda ser invocable dentro de nuestro lenguaje
 
-import { InterpreterVisitor } from "../patron/interprete.js";
-import { Entorno } from "../patron/entorno.js";
+import { InterpreterVisitor } from "../../patron/interprete.js";
+import { Entorno } from "../../patron/entorno.js";
 
 export class Invocable {
     

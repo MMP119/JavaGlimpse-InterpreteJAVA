@@ -1,4 +1,4 @@
-import {registrarError} from '../global/errores.js';
+import {registrarError} from '../../global/errores.js';
 
 export class DecVariables {
 

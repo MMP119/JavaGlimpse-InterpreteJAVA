@@ -1,21 +1,21 @@
 import {Entorno} from './entorno.js'
 import {BaseVisitor} from './visitor.js'
 import nodos, {Expresion} from './nodos.js';
-import {ExcepcionBrake, ExcepcionContinue, ExcepcionReturn} from '../expresiones/transferencia.js';
+import {ExcepcionBrake, ExcepcionContinue, ExcepcionReturn} from '../expresiones/operaciones/transferencia.js';
 import { registrarError } from '../global/errores.js';
-import {Invocable} from '../expresiones/invocable.js';
-import {embebidas} from '../expresiones/embebidas.js';
-import {Aritmetica} from '../expresiones/aritmeticas.js';
-import {DecVariables} from '../expresiones/decVariables.js';
-import {DecArreglos} from '../expresiones/decArreglos.js';
-import {Relacionales} from '../expresiones/relacionales.js';
-import {Logicas} from '../expresiones/logicas.js';
-import {Unaria} from '../expresiones/Unaria.js';
-import {AsigVariables} from '../expresiones/asigVariables.js';
-import {ArrayFunc} from '../expresiones/arrayFunc.js';
-import { DecMatriz } from '../expresiones/decMatriz.js';
-import { MatrizFunc } from '../expresiones/matrizFunc.js';
-import { FuncionForanea } from '../expresiones/foreanea.js';
+import {Invocable} from '../expresiones/funciones/invocable.js';
+import {embebidas} from '../expresiones/funciones/embebidas.js';
+import {Aritmetica} from '../expresiones/operaciones/aritmeticas.js';
+import {DecVariables} from '../expresiones/variables/decVariables.js';
+import {DecArreglos} from '../expresiones/arrays/decArreglos.js';
+import {Relacionales} from '../expresiones/operaciones/relacionales.js';
+import {Logicas} from '../expresiones/operaciones/logicas.js';
+import {Unaria} from '../expresiones/operaciones/Unaria.js';
+import {AsigVariables} from '../expresiones/variables/asigVariables.js';
+import {ArrayFunc} from '../expresiones/arrays/arrayFunc.js';
+import { DecMatriz } from '../expresiones/matrices/decMatriz.js';
+import { MatrizFunc } from '../expresiones/matrices/matrizFunc.js';
+import { FuncionForanea } from '../expresiones/funciones/foreanea.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -676,12 +676,11 @@ visitPrint(node) {
     visitLlamada(node) {
         const nombreFuncion = node.callee.id;
         const funcion = this.entornoActual.getVariable(nombreFuncion, node.location.start.line, node.location.start.column);
-        console.log(funcion);
         const argumentos = node.args.map(arg => arg.accept(this));
     
         if (!(funcion.valor instanceof Invocable)) {
             //throw new Error(`La variable '${nombreFuncion}' no es invocable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError("Semantico",`La variable '${nombreFuncion}' no es invocable`, node.location.start.line, node.location.start.column);
+            registrarError("Semantico",`La funcion '${nombreFuncion}' no es invocable`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
     
@@ -700,10 +699,11 @@ visitPrint(node) {
      * @type {BaseVisitor['visitFuncDcl']}
      */
     visitFuncDcl(node) {
-        const funcion = new FuncionForanea(node);
-        console.log(funcion);
+        const funcion = new FuncionForanea(node, this.entornoActual);
+
+        if(funcion.verificarReservada(node, node.id))return;
+
         this.entornoActual.setVariable(node.id, {tipo: node.tipo, valor: funcion}, node.location.start.line, node.location.start.column);
-    
     }
 
 }
