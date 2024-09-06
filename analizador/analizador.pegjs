@@ -48,11 +48,13 @@ Declaracion = dcl:DecVariable _ { return dcl }
 
 
 //para funciones
-DecFuncion = tipo:(TiposDatosPrimitivos/"void")  _ id:Identificador _ "(" _ params:Parametros? _ ")" _ bloque:Bloque { return crearNodo('dclFunc', { tipo, id, params: params || [], bloque }) }
+DecFuncion = tipo:(TiposDatosPrimitivos /"void")  _ id:Identificador _ "(" _ params:Parametros? _ ")" _ bloque:Bloque { return crearNodo('dclFunc', { tipo, id, params: params || [], bloque }) }
 
 Parametros = primerParam:Parametro _ params:("," _ param:Parametro { return param })* { return [primerParam, ...params] }
 
-Parametro = tipo:TiposDatosPrimitivos _ id:Identificador { return { tipo, id } }
+Parametro = tipo:( tip:TiposDatosPrimitivos ConArreglo {return tip;} / TiposDatosPrimitivos) _ id:Identificador { return { tipo, id } }
+
+ConArreglo = _ ("[" _ "]")+
 
 
 

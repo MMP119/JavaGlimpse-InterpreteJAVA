@@ -41,7 +41,7 @@ export class MatrizFunc {
         const lastIdx = indices[indices.length - 1].valor;
 
         if(ref[lastIdx] === undefined){
-            console.error(`Error: El índice ${indices[indices.length - 2].valor} está fuera de los límites en la posición ${indices.length - 2}`);
+            //console.error(`Error: El índice ${indices[indices.length - 2].valor} está fuera de los límites en la posición ${indices.length - 2}`);
             registrarError('Semántico', `Índice fuera de rango en la posición ${indices[indices.length - 2].valor}`, node.location.start.line, node.location.start.column);
             return {tipo:'Error', valor:null};
         }
@@ -55,14 +55,14 @@ export class MatrizFunc {
         for (let i = 0; i < indices.length; i++) {
             // Verificar si `ref` existe antes de intentar acceder al siguiente índice
             if (ref === undefined) {
-                console.error(`Error: El índice ${indices[i].valor} está fuera de los límites en la posición ${i}`);
+                //console.error(`Error: El índice ${indices[i].valor} está fuera de los límites en la posición ${i}`);
                 registrarError('Semántico', `Índice fuera de rango en la posición ${indices[i].valor}`, node.location.start.line, node.location.start.column);
                 return {tipo:'Error', valor:null}; 
             }
             ref = ref[indices[i].valor];
         }
         if(ref === undefined){
-            console.error(`Error: El índice ${indices[indices.length - 1].valor} está fuera de los límites en la posición ${indices.length - 1}`);
+            //console.error(`Error: El índice ${indices[indices.length - 1].valor} está fuera de los límites en la posición ${indices.length - 1}`);
             registrarError('Semántico', `Índice fuera de rango en la posición ${indices[indices.length - 1].valor}`, node.location.start.line, node.location.start.column);
             return {tipo:'Error', valor:null};
         }

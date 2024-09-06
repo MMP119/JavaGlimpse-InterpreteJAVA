@@ -151,7 +151,7 @@ export class InterpreterVisitor extends BaseVisitor {
         //verificar si node.exp es un arreglo o no
         let expresion = null;
         if(Array.isArray(node.exp)){
-            expresion = node.exp;
+            expresion = node.exp.map(exp => exp.accept(this));
         }
         if(!Array.isArray(node.exp) && node.exp != null){
             expresion = node.exp.accept(this);
@@ -185,8 +185,13 @@ export class InterpreterVisitor extends BaseVisitor {
         let expN = null;
 
         if(!Array.isArray(node.exp) && Array.isArray(node.expN)){ //son numeros entonces es una matriz con tamaño definido,  int [][] mtz = new int [numero][numero]
-            exp = node.exp
+            exp = node.exp.accept(this);
             expN = node.expN
+
+            let expNAcceps;
+            if(Array.isArray(expN)){
+                expNAcceps = expN.map(expN => expN.accept(this));
+            }
 
             if(exp.tipo != 'int'){
                 registrarError("Semantico",`Los valores de la matriz deben ser de tipo entero`, node.location.start.line, node.location.start.column);
@@ -194,7 +199,7 @@ export class InterpreterVisitor extends BaseVisitor {
             }
 
             //ahora verificar para expN que es un arreglo de numeros
-            for(const expresion of expN){
+            for(const expresion of expNAcceps){
                 if(expresion.tipo != 'int'){
                     registrarError("Semantico",`Los valores de la matriz deben ser de tipo entero`, node.location.start.line, node.location.start.column);
                     return {tipo: 'Error', valor: null};
@@ -206,7 +211,7 @@ export class InterpreterVisitor extends BaseVisitor {
                 return {tipo: 'Error', valor: null};
             }
 
-            for(const expresion of expN){
+            for(const expresion of expNAcceps){
                 if(expresion.valor <= 0){
                     registrarError("Semantico",`Los valores de la matriz deben ser mayores a cero`, node.location.start.line, node.location.start.column);
                     return {tipo: 'Error', valor: null};
@@ -218,7 +223,7 @@ export class InterpreterVisitor extends BaseVisitor {
                 return {tipo: 'Error', valor: null};
             }
 
-            const declararMatriz = new DecMatriz(node.tipo, idMatriz, exp, expN, node.tipo2);
+            const declararMatriz = new DecMatriz(node.tipo, idMatriz, exp, expNAcceps, node.tipo2);
             if(declararMatriz.verificarReservada(node, idMatriz)) return;
 
             const {tipo, valor} = declararMatriz.declararMatriz(node);
@@ -228,7 +233,25 @@ export class InterpreterVisitor extends BaseVisitor {
 
         }else{
 
-            const declararMatriz = new DecMatriz(node.tipo, idMatriz, node.exp, node.expN, node.tipo2);
+            let expAccept;
+            
+            // Función recursiva para aceptar arreglos de cualquier dimensión
+            const aceptarArreglo = (arr) => {
+                if (Array.isArray(arr)) {
+                    // Si es un arreglo, aplicar recursivamente la misma función para cada elemento
+                    return arr.map(subElemento => aceptarArreglo(subElemento));
+                } else {
+                    // Si es un elemento base (no un arreglo), aceptar el valor
+                    return arr.accept(this);
+                }
+            }
+
+            // Verificar si node.exp es un arreglo de múltiples dimensiones y procesarlo recursivamente
+            if (Array.isArray(node.exp)) {
+                expAccept = aceptarArreglo(node.exp);
+            }
+
+            const declararMatriz = new DecMatriz(node.tipo, idMatriz, expAccept, node.expN, node.tipo2);
             if(declararMatriz.verificarReservada(node, idMatriz)) return;
 
             const {tipo, valor} = declararMatriz.declararMatriz(node);
@@ -255,7 +278,12 @@ export class InterpreterVisitor extends BaseVisitor {
             return {tipo: 'Error', valor: null};
         }
 
-        const matrizFunc = new MatrizFunc(matriz, method, indices, value);
+        let indiceAccepts;
+        if(Array.isArray(indices)){
+            indiceAccepts = indices.map(indice => indice.accept(this));
+        }
+
+        const matrizFunc = new MatrizFunc(matriz, method, indiceAccepts, value);
         return matrizFunc.ejecutar(node);
 
     }
