@@ -27,9 +27,8 @@ export class InterpreterVisitor extends BaseVisitor {
         // funciones embebidas
         Object.entries(embebidas).forEach(([nombre, funcion]) => {
             let tipo = funcion.invocar().tipo;
-            let valor = funcion.invocar().valor;
-            this.entornoActual.setFuncion(nombre, {tipo:tipo, valor:valor}, "", "");
-            console.log(`Función embebida: ${nombre}`, funcion);  // Imprime para verificar que las funciones están siendo añadidas correctamente
+            this.entornoActual.setFuncion(nombre, {tipo:tipo, valor:funcion}, "", "");
+            //console.log(`Función embebida: ${nombre}`, funcion.invocar());  // Imprime para verificar que las funciones están siendo añadidas correctamente
         });
 
         //para los errores
@@ -360,7 +359,7 @@ visitPrint(node) {
         const valor = exp.accept(this);
 
         // Si el valor es null, manejar el caso de división por 0
-        if (valor.tipo === null && valor.valor === null) {
+        if (valor.tipo == 'Error' && valor.valor == 'div 0') {
             this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
         } else {
             // Verificar si el valor es una matriz o array

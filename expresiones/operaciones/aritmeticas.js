@@ -102,8 +102,8 @@ export class Aritmetica {
                 if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
 
                     if(parseInt(this.der.valor) === 0){
-                        //new Error("No se puede dividir entre 0");
-                        return {tipo: null, valor: null};
+                        registrarError('Semántico', 'No se puede dividir entre 0', node.location.start.line, node.location.start.column);
+                        return {tipo: 'Error', valor: 'div 0'};
                     }
 
                     const resultado = parseInt(this.izq.valor) / parseInt(this.der.valor);
@@ -114,8 +114,8 @@ export class Aritmetica {
                 if(this.izq.tipo === 'int' && this.der.tipo === 'float'){
 
                     if(parseFloat(this.der.valor) === 0){
-                        //new Error("No se puede dividir entre 0");
-                        return {tipo: null, valor: null};
+                        registrarError('Semántico', 'No se puede dividir entre 0', node.location.start.line, node.location.start.column);
+                        return {tipo: 'Error', valor: 'div 0'};                        
                     }
 
                     //pasar el valor izq y der a float y retornar todos los decimales
@@ -126,8 +126,8 @@ export class Aritmetica {
                 if(this.izq.tipo === 'float' && this.der.tipo === 'float'){
 
                     if(parseFloat(this.der.valor) === 0){
-                        //new Error("No se puede dividir entre 0");
-                        return {tipo: null, valor: null};
+                        registrarError('Semántico', 'No se puede dividir entre 0', node.location.start.line, node.location.start.column);
+                        return {tipo: 'Error', valor: 'div 0'};
                     }
 
                     const resultado = parseFloat(this.izq.valor) / parseFloat(this.der.valor);
@@ -137,8 +137,8 @@ export class Aritmetica {
                 if(this.izq.tipo === 'float' && this.der.tipo === 'int'){
 
                     if(parseInt(this.der.valor) === 0){
-                        //new Error("No se puede dividir entre 0");
-                        return {tipo: null, valor: null};
+                        registrarError('Semántico', 'No se puede dividir entre 0', node.location.start.line, node.location.start.column);
+                        return {tipo: 'Error', valor: 'div 0'};
                     }
 
                     const resultado = parseFloat(this.izq.valor) / parseFloat(this.der.valor);
@@ -154,8 +154,8 @@ export class Aritmetica {
                 if(this.izq.tipo=== 'int' && this.der.tipo === 'int'){
 
                     if(parseInt(this.der.valor) === 0){
-                        //new Error("No se puede dividir entre 0");
-                        return {tipo: null, valor: null};
+                        registrarError('Semántico', 'No se puede dividir entre 0', node.location.start.line, node.location.start.column);
+                        return {tipo: 'Error', valor: 'div 0'};
                     }
 
                     const resultado = parseInt(this.izq.valor) % parseInt(this.der.valor);

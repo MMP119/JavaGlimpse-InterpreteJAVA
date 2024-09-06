@@ -89,10 +89,10 @@ export class DecVariables {
                 
                 case 'float':
                     
-                    if(this.exp.tipo === 'float'){
+                    if(this.exp.tipo === 'float' || this.exp.tipo === 'int'){
                         return {
                             tipo: this.tipo,
-                            valor: this.exp.valor
+                            valor: parseFloat(this.exp.valor)
                         }
                     }
                     else{
