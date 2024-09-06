@@ -16,6 +16,7 @@ export class ExcepcionReturn extends Error {
      */
     constructor(value) {
         super('Return');
+        console.log(value);
         this.value = value;
     }
 }

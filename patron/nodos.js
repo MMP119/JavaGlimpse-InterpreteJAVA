@@ -681,6 +681,55 @@ export class Llamada extends Expresion {
     }
 }
     
+export class FuncDcl extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de dato
+ * @param {string} options.id Identificador de la funcion
+ * @param {string[]} options.params Parametros de la funcion
+ * @param {Bloque} options.bloque Cuerpo de la funcion
+    */
+    constructor({ tipo, id, params, bloque }) {
+        super();
+        
+        /**
+         * Tipo de dato
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la funcion
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Parametros de la funcion
+         * @type {string[]}
+        */
+        this.params = params;
+
+
+        /**
+         * Cuerpo de la funcion
+         * @type {Bloque}
+        */
+        this.bloque = bloque;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitFuncDcl(this);
+    }
+}
+    
 export class Ternario extends Expresion {
 
     /**
@@ -967,4 +1016,4 @@ export class MatrizFunc extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, Ternario, Switch, DeclaracionArreglo, DeclaracionMatriz, ArrayFunc, MatrizFunc }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, FuncDcl, Ternario, Switch, DeclaracionArreglo, DeclaracionMatriz, ArrayFunc, MatrizFunc }

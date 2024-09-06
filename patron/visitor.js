@@ -64,6 +64,9 @@
  * @typedef {import('./nodos').Llamada} Llamada
 
 
+ * @typedef {import('./nodos').FuncDcl} FuncDcl
+
+
  * @typedef {import('./nodos').Ternario} Ternario
 
 
@@ -277,6 +280,15 @@ export class BaseVisitor {
      */
     visitLlamada(node) {
         throw new Error('Metodo visitLlamada no implementado');
+    }
+    
+
+    /**
+     * @param {FuncDcl} node
+     * @returns {any}
+     */
+    visitFuncDcl(node) {
+        throw new Error('Metodo visitFuncDcl no implementado');
     }
     
 

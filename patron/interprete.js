@@ -15,6 +15,7 @@ import {AsigVariables} from '../expresiones/asigVariables.js';
 import {ArrayFunc} from '../expresiones/arrayFunc.js';
 import { DecMatriz } from '../expresiones/decMatriz.js';
 import { MatrizFunc } from '../expresiones/matrizFunc.js';
+import { FuncionForanea } from '../expresiones/foreanea.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -674,23 +675,35 @@ visitPrint(node) {
      */
     visitLlamada(node) {
         const nombreFuncion = node.callee.id;
-        const funcion = this.entornoActual.getFuncion(nombreFuncion, node.location.start.line, node.location.start.column);
+        const funcion = this.entornoActual.getVariable(nombreFuncion, node.location.start.line, node.location.start.column);
+        console.log(funcion);
         const argumentos = node.args.map(arg => arg.accept(this));
     
-        if (!(funcion instanceof Invocable)) {
+        if (!(funcion.valor instanceof Invocable)) {
             //throw new Error(`La variable '${nombreFuncion}' no es invocable\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             registrarError("Semantico",`La variable '${nombreFuncion}' no es invocable`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
     
-        if (funcion.aridad() !== argumentos.length) {
+        if (funcion.valor.aridad() !== argumentos.length) {
             //throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             registrarError("Semantico",`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
     
-        const resultado = funcion.invocar(this, argumentos);
+        const resultado = funcion.valor.invocar(this, argumentos);
         return resultado;
+    }
+
+
+    /**
+     * @type {BaseVisitor['visitFuncDcl']}
+     */
+    visitFuncDcl(node) {
+        const funcion = new FuncionForanea(node);
+        console.log(funcion);
+        this.entornoActual.setVariable(node.id, {tipo: node.tipo, valor: funcion}, node.location.start.line, node.location.start.column);
+    
     }
 
 }

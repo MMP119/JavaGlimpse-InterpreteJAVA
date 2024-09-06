@@ -28,6 +28,7 @@
         "arrayFunc": nodos.ArrayFunc,
         "declaracionMatriz": nodos.DeclaracionMatriz,
         "matrizFunc": nodos.MatrizFunc,
+        'dclFunc': nodos.FuncDcl,
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -42,8 +43,16 @@ programa = _ dcl:Declaracion* _ { return dcl }
 
 
 Declaracion = dcl:DecVariable _ { return dcl }
-
+            / dcl:DecFuncion _ { return dcl }
             / stmt:Stmt _ { return stmt }
+
+
+//para funciones
+DecFuncion = tipo:(TiposDatosPrimitivos/"void")  _ id:Identificador _ "(" _ params:Parametros? _ ")" _ bloque:Bloque { return crearNodo('dclFunc', { tipo, id, params: params || [], bloque }) }
+
+
+Parametros = id:Identificador _ params:("," _ ids:Identificador { return ids })* { return [id, ...params] }
+
 
 
 DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresion _ ";" { return crearNodo('declaracionTipoVariable', { tipo, id, exp }) }
@@ -90,7 +99,7 @@ ExpresionConComa = exp:Expresion _ coma:("," _ exp2:Expresion{return exp2})* { r
 // steatements NO DECLARATIVOS, es decir, que no declaran variables
 Stmt = "System.out.println(" _ exp:ExpresionConComa _ ")" _ ";" { return crearNodo('print', { exp }) }
 
-    / "{" _ dcls:Declaracion* _ "}" { return crearNodo('bloque', { dcls }) }
+    / Bloque:Bloque { return Bloque }
 
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtTrue:Stmt stmtFalse:( _ "else" _ stmtFalse:Stmt { return stmtFalse } )? { return crearNodo('if', { cond, stmtTrue, stmtFalse }) }
 
@@ -110,6 +119,9 @@ Stmt = "System.out.println(" _ exp:ExpresionConComa _ ")" _ ";" { return crearNo
     / SwitchStmt //reglas para el switch-case
 
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
+
+
+Bloque = "{" _ dcls:Declaracion* _ "}" { return crearNodo('bloque', { dcls }) }
 
 
 ForInit = dcl:Declaracion { return dcl }
