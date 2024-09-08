@@ -457,7 +457,7 @@ visitPrint(node) {
      */
     visitBloque(node) {
         const entornoAnterior = this.entornoActual;
-        this.entornoActual = new Entorno("",entornoAnterior);
+        this.entornoActual = new Entorno("bloque",entornoAnterior);
 
         node.dcls.forEach(dcl => {
             if (dcl) {
