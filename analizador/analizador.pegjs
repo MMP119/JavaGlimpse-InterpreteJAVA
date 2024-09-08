@@ -29,6 +29,7 @@
         "declaracionMatriz": nodos.DeclaracionMatriz,
         "matrizFunc": nodos.MatrizFunc,
         'dclFunc': nodos.FuncDcl,
+        'typeof': nodos.typEof
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -151,6 +152,8 @@ Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asigna
             / OperadorAsignacion
 
             / Ternario
+
+            / "typeof" _  exp:Expresion _ { return crearNodo('typeof', { exp }) }
             
             / Or
 

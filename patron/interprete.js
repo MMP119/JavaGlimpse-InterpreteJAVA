@@ -26,8 +26,28 @@ export class InterpreterVisitor extends BaseVisitor {
 
         // funciones embebidas
         Object.entries(embebidas).forEach(([nombre, funcion]) => {
-            let tipo = funcion.invocar().tipo;
-            this.entornoActual.setFuncion(nombre, {tipo:tipo, valor:funcion}, "", "");
+
+            if(nombre === 'parseInt'){
+                this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
+            }else if(nombre === 'parsefloat'){
+                this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
+            }else if(nombre === 'toString'){
+                this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
+            }else if(nombre === 'toLowerCase'){
+                this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
+            }else if(nombre === 'toUpperCase'){
+                this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
+            }else if(nombre === 'typeof'){
+                this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
+            }else if(nombre === 'time'){
+                this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
+            }
+
+
+
+
+            //let tipo = funcion.invocar().tipo;
+            //this.entornoActual.setFuncion(nombre, {tipo:'funcion', valor:funcion}, "", "");
             //console.log(`Función embebida: ${nombre}`, funcion.invocar());  // Imprime para verificar que las funciones están siendo añadidas correctamente
         });
 
@@ -706,11 +726,19 @@ visitPrint(node) {
         const nombreFuncion = node.callee.id;
         const funcion = this.entornoActual.getFuncion(nombreFuncion, node.location.start.line, node.location.start.column);
         const argumentos = node.args.map(arg => arg.accept(this));
-    
-        if (funcion.valor.aridad() !== argumentos.length) {
-            //throw new Error(`Número incorrecto de argumentos para la función '${nombreFuncion}'\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
-            registrarError("Semantico",`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
-            return {tipo: 'Error', valor: null};
+
+        if(funcion.tipo === 'funcion'){ //es embbebida
+            if(funcion.valor.aridad != argumentos.length){
+                registrarError("Semantico",`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            }
+            const resultado = funcion.valor.invocar(argumentos);
+            return resultado;
+        }else{
+            if (funcion.valor.aridad() !== argumentos.length) {
+                registrarError("Semantico",`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            }
         }
     
         const resultado = funcion.valor.invocar(this, argumentos);
@@ -727,6 +755,30 @@ visitPrint(node) {
         if(funcion.verificarReservada(node, node.id))return;
 
         this.entornoActual.setFuncion(node.id, {tipo: node.tipo, valor: funcion}, node.location.start.line, node.location.start.column);
+    }
+
+    visittypEof(node){
+        const argumento = node.exp.accept(this);
+        if(argumento.tipo === 'Error' || argumento === null){
+            registrarError("Semantico", `No se puede determinar el tipo de '${node.exp}'`, node.location.start.line, node.location.start.column);
+            return { tipo: 'Error', valor: null };
+        }
+        // Devolver el tipo como string
+        switch (argumento.tipo) {
+            case 'int':
+                return { tipo: 'string', valor: 'int' };
+            case 'float':
+                return { tipo: 'string', valor: 'float' };
+            case 'string':
+                return { tipo: 'string', valor: 'string' };
+            case 'boolean':
+                return { tipo: 'string', valor: 'boolean' };
+            case 'char':
+                return { tipo: 'string', valor: 'char' };
+            default:
+                registrarError("Semantico", `Tipo de dato no soportado para typeof`, node.location.start.line, node.location.start.column);
+                return { tipo: 'Error', valor: null };
+        }
     }
 
 }

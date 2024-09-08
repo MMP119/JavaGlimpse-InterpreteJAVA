@@ -84,6 +84,9 @@
 
  * @typedef {import('./nodos').MatrizFunc} MatrizFunc
 
+
+ * @typedef {import('./nodos').typEof} typEof
+
  */
 
 
@@ -343,6 +346,15 @@ export class BaseVisitor {
      */
     visitMatrizFunc(node) {
         throw new Error('Metodo visitMatrizFunc no implementado');
+    }
+    
+
+    /**
+     * @param {typEof} node
+     * @returns {any}
+     */
+    visittypEof(node) {
+        throw new Error('Metodo visittypEof no implementado');
     }
     
 }

@@ -58,7 +58,7 @@ document.getElementById('runButton').addEventListener('click', () => {
 
         const erroes = obtenerErrores();
         if(erroes.length > 0){
-            output += '\n\n====== ERRORES ======\n';
+            output += '\n\n============================== ERRORES ==============================\n';
             erroes.forEach(error => {
                 output += `Error: ${error.mensaje}\nLínea: ${error.linea}, Columna: ${error.columna}\n`;
             });
