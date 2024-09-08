@@ -14,7 +14,7 @@ export class Invocable {
      * @param interprete {InterpreterVisitor}
      * @param args {any[]}
      */
-    invocar(interprete, args){ // itnerprete la instancia del visitor, clousure es el entorno donde se ejecutara la funcion
+    invocar(interprete, args, nombreFuncion){ // itnerprete la instancia del visitor, clousure es el entorno donde se ejecutara la funcion
         throw new Error("No implementado");
     }
 

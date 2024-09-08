@@ -21,7 +21,7 @@ export class InterpreterVisitor extends BaseVisitor {
 
     constructor() {
         super();
-        this.entornoActual = new Entorno(); //este es el entorno global, se inicia el visitor
+        this.entornoActual = new Entorno('Global'); //este es el entorno global, se inicia el visitor
         this.salida = '';
 
         // funciones embebidas
@@ -457,7 +457,7 @@ visitPrint(node) {
      */
     visitBloque(node) {
         const entornoAnterior = this.entornoActual;
-        this.entornoActual = new Entorno(entornoAnterior);
+        this.entornoActual = new Entorno("",entornoAnterior);
 
         node.dcls.forEach(dcl => {
             if (dcl) {
@@ -741,7 +741,7 @@ visitPrint(node) {
             }
         }
     
-        const resultado = funcion.valor.invocar(this, argumentos);
+        const resultado = funcion.valor.invocar(this, argumentos, nombreFuncion);
         return resultado;
     }
 

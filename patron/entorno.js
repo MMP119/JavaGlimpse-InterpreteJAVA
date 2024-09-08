@@ -1,11 +1,13 @@
 import {registrarError} from '../global/errores.js';
+import { agregarSimbolo } from '../global/simbolos.js';{}
 
 export class Entorno {
 
     /**
         * @param {Entorno} padre
      */
-    constructor(padre = undefined) {
+    constructor(nombre, padre = undefined) {
+        this.nombreEntorno = nombre;
         this.valores = {};
         this.funcionesEmbebidas = {}; // para implementar las funciones embebidas
         this.funciones = {};
@@ -23,6 +25,7 @@ export class Entorno {
             return{tipo: 'Error', valor: null};
         }
         this.valores[nombre] = {tipo, valor};
+        agregarSimbolo(nombre, 'Variable', tipo, this.nombreEntorno, fila, columna);
     }
 
     /**
@@ -50,6 +53,7 @@ export class Entorno {
             return;
         }
         this.funciones[nombre] = {tipo, valor};
+        agregarSimbolo(nombre, 'Funcion', tipo, this.nombreEntorno, fila, columna);
     }
 
     getFuncion(nombre, fila, columna) {

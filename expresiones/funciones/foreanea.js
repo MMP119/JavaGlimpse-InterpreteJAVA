@@ -54,8 +54,8 @@ export class FuncionForanea extends Invocable{
     /**
      * @type {Invocable['invocar']} 
      */
-    invocar(interprete, args){
-        const entornoNuevo = new Entorno(this.clousure);
+    invocar(interprete, args, nombreFuncion){
+        const entornoNuevo = new Entorno(nombreFuncion, this.clousure);
         
 
         this.nodo.params.forEach((param, index) => {
@@ -72,7 +72,7 @@ export class FuncionForanea extends Invocable{
             const {tipo, id} = param;
             const valor = args[index];
 
-            entornoNuevo.setVariable(id, {tipo: tipo, valor: valor.valor});
+            entornoNuevo.setVariable(id, {tipo: tipo, valor: valor.valor}, this.nodo.location.start.line, this.nodo.location.start.column);
         });
 
 

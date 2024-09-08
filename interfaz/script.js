@@ -1,6 +1,7 @@
 import { parse } from '../analizador/analizador.js';
 import { InterpreterVisitor} from '../patron/interprete.js';
 import { obtenerErrores, limpiarErrores, obtenerErroresHTML } from '../global/errores.js';
+import { obtenerSimbolos, limpiarSimbolos, obtenerSimbolosHTML } from '../global/simbolos.js';
 
 // Inicializa CodeMirror en el textarea con id 'codeInput'
 var editor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
@@ -40,6 +41,7 @@ document.getElementById('openButton').addEventListener('click', function() {
 document.getElementById('runButton').addEventListener('click', () => {
 
     limpiarErrores(); // Limpiar errores anteriores
+    limpiarSimbolos(); // Limpiar tabla de símbolos
     const code = editor.getValue();
 
     try {
@@ -138,4 +140,5 @@ document.getElementById('erroresButton').addEventListener('click', function() {
 
 //para el botón de tabla de simbolos
 document.getElementById('simbolosButton').addEventListener('click', function() {
+    obtenerSimbolosHTML();
 });
