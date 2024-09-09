@@ -12,19 +12,15 @@ export class DecVariables {
     verificarReservada(node, id){
 
         const reservedWords = new Set([
-            'abstract', 'await', 'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class', 
-            'const', 'continue', 'debugger', 'default', 'delete', 'do', 'double', 'else', 
-            'enum', 'export', 'extends', 'false', 'final', 'finally', 'float', 'for', 'function', 
-            'goto', 'if', 'implements', 'import', 'in', 'instanceof', 'int', 'interface', 
-            'let', 'long', 'native', 'new', 'null', 'package', 'private', 'protected', 'public', 
-            'return', 'short', 'static', 'super', 'switch', 'synchronized', 'this', 'throw', 
-            'transient', 'true', 'try', 'typeof', 'var', 'void', 'volatile', 'while', 'with', 
-            'yield', 'join', 'length', 'indexOf'
+            'boolean', 'break', 'case', 'char', 'continue', 'default', 'else', 'struct', 'string', 'parseInt',
+            'false', 'float', 'for','if','int','null', 'return', 'switch', 'true',  'typeof', 'var', 'void','while', 
+            'join', 'length', 'indexOf', 'parsefloat', 'toString', 'toLowerCase', 'toUpperCase', 'typeof'
         ]);
     
-        if(reservedWords.has(this.id)){
-            registrarError("Semantico", "Variable con nombre de palabra reservada", node.location.start.line, node.location.start.column);
+        if(reservedWords.has(id)){
             return true;
+        }else{
+            return false;
         }
     
     }

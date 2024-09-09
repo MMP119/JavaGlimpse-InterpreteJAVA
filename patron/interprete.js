@@ -150,7 +150,10 @@ export class InterpreterVisitor extends BaseVisitor {
         const declararVariable = new DecVariables(tipoVariable, nombreVariable, valorVariable);
 
         //verificar si la variable es una palabra reservada
-        if(declararVariable.verificarReservada(node, nombreVariable)) return;
+        if(declararVariable.verificarReservada(node, nombreVariable)) {
+            registrarError("Semantico",`El ID de la variable ${nombreVariable} es una palabra reservada`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        };
 
         const {tipo, valor} = declararVariable.asignar(node);
 
@@ -183,7 +186,10 @@ export class InterpreterVisitor extends BaseVisitor {
 
         const declararArreglo = new DecArreglos(tipoArreglo1, idArreglo1, expresion, tipoArreglo2, idArreglo2);
 
-        if(declararArreglo.verificarReservada(node, idArreglo1, idArreglo2)) return;
+        if(declararArreglo.verificarReservada(node, idArreglo1, idArreglo2)) {
+            registrarError("Semantico",`El ID de la variable ${idArreglo1} es una palabra reservada`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        };
 
         const {tipo, valor} = declararArreglo.declarar(node);
         //console.log(valor[3]); //prueba de impresion de un valor de un arreglo en una posicion especifica
@@ -245,7 +251,10 @@ export class InterpreterVisitor extends BaseVisitor {
             }
 
             const declararMatriz = new DecMatriz(node.tipo, idMatriz, exp, expNAcceps, node.tipo2);
-            if(declararMatriz.verificarReservada(node, idMatriz)) return;
+            if(declararMatriz.verificarReservada(node, idMatriz)) {
+                registrarError("Semantico",`El ID de la variable ${idMatriz} es una palabra reservada`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            };
 
             const {tipo, valor} = declararMatriz.declararMatriz(node);
 
@@ -273,7 +282,10 @@ export class InterpreterVisitor extends BaseVisitor {
             }
 
             const declararMatriz = new DecMatriz(node.tipo, idMatriz, expAccept, node.expN, node.tipo2);
-            if(declararMatriz.verificarReservada(node, idMatriz)) return;
+            if(declararMatriz.verificarReservada(node, idMatriz)) {
+                registrarError("Semantico",`El ID de la variable ${idMatriz} es una palabra reservada`, node.location.start.line, node.location.start.column);
+                return {tipo: 'Error', valor: null};
+            };
 
             const {tipo, valor} = declararMatriz.declararMatriz(node);
             this.entornoActual.setVariable(idMatriz, {tipo, valor}, node.location.start.line, node.location.start.column);
@@ -362,6 +374,11 @@ export class InterpreterVisitor extends BaseVisitor {
     visitReferenciaVariable(node) {
         const nombreVariable = node.id;
         const valores = this.entornoActual.getVariable(nombreVariable, node.location.start.line, node.location.start.column);
+        if(!valores){
+            //throw new Error(`La variable '${nombreVariable}' no existe en el entorno actual\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
+            registrarError("Semantico",`La variable '${nombreVariable}' no existe en el entorno actual`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        }
         return valores;
     }
 
@@ -724,6 +741,11 @@ visitPrint(node) {
         const funcion = this.entornoActual.getFuncion(nombreFuncion, node.location.start.line, node.location.start.column);
         const argumentos = node.args.map(arg => arg.accept(this));
 
+        if(!funcion){
+            registrarError("Semantico",`La función '${nombreFuncion}' no existe`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        }
+
         if(funcion.tipo === 'funcion'){ //es embbebida
             if(funcion.valor.aridad != argumentos.length){
                 registrarError("Semantico",`Número incorrecto de argumentos para la función '${nombreFuncion}'`, node.location.start.line, node.location.start.column);
@@ -749,7 +771,10 @@ visitPrint(node) {
     visitFuncDcl(node) {
         const funcion = new FuncionForanea(node, this.entornoActual);
 
-        if(funcion.verificarReservada(node, node.id))return;
+        if(funcion.verificarReservada(node, node.id)){
+            registrarError('Semántico', `El ID de la fucion ${node.id} es una palabra reservada`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        };
 
         this.entornoActual.setFuncion(node.id, {tipo: node.tipo, valor: funcion}, node.location.start.line, node.location.start.column);
     }
@@ -776,6 +801,10 @@ visitPrint(node) {
                 registrarError("Semantico", `Tipo de dato no soportado para typeof`, node.location.start.line, node.location.start.column);
                 return { tipo: 'Error', valor: null };
         }
+    }
+
+    visitStructDcl(node){
+        
     }
 
 }
