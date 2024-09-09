@@ -1041,4 +1041,37 @@ export class typEof extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, FuncDcl, Ternario, Switch, DeclaracionArreglo, DeclaracionMatriz, ArrayFunc, MatrizFunc, typEof }
+export class StructDcl extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador del struct
+ * @param {Expresion[]} options.dcls Declaraciones del struct
+    */
+    constructor({ id, dcls }) {
+        super();
+        
+        /**
+         * Identificador del struct
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Declaraciones del struct
+         * @type {Expresion[]}
+        */
+        this.dcls = dcls;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitStructDcl(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Booleano, DeclaracionTipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Foreach, Break, Continue, Return, Llamada, FuncDcl, Ternario, Switch, DeclaracionArreglo, DeclaracionMatriz, ArrayFunc, MatrizFunc, typEof, StructDcl }

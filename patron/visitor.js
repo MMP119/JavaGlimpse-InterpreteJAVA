@@ -87,6 +87,9 @@
 
  * @typedef {import('./nodos').typEof} typEof
 
+
+ * @typedef {import('./nodos').StructDcl} StructDcl
+
  */
 
 
@@ -355,6 +358,15 @@ export class BaseVisitor {
      */
     visittypEof(node) {
         throw new Error('Metodo visittypEof no implementado');
+    }
+    
+
+    /**
+     * @param {StructDcl} node
+     * @returns {any}
+     */
+    visitStructDcl(node) {
+        throw new Error('Metodo visitStructDcl no implementado');
     }
     
 }

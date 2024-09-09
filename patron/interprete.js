@@ -378,35 +378,30 @@ visitPrint(node) {
     node.exp.forEach((exp, index) => {
         const valor = exp.accept(this);
 
-        // Si el valor es null, manejar el caso de división por 0
-        if (valor.tipo == 'Error' && valor.valor == 'div 0') {
-            this.salida += `\n¡ADVERTENCIA! No se puede dividir entre 0 \nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`;
+        // Verificar si el valor es una matriz o array
+        if (Array.isArray(valor.valor)) {
+            // Crear una función recursiva para extraer solo los valores numéricos
+            const extraerValores = (arr) => {
+                return arr.map(elemento => {
+                    if (Array.isArray(elemento)) {
+                        // Si el elemento es un array, hacer la llamada recursiva
+                        return extraerValores(elemento);
+                    } else if (elemento && elemento.hasOwnProperty('valor')) {
+                        // Si es un objeto con la propiedad 'valor', extraer solo el valor
+                        return elemento.valor;
+                    }
+                    return elemento;  // En caso de no ser un objeto esperado
+                });
+            };
+
+            // Usar la función para obtener solo los valores numéricos
+            const valoresExtraidos = extraerValores(valor.valor);
+
+            // Convertir a string solo los valores extraídos
+            resultado += JSON.stringify(valoresExtraidos);
         } else {
-            // Verificar si el valor es una matriz o array
-            if (Array.isArray(valor.valor)) {
-                // Crear una función recursiva para extraer solo los valores numéricos
-                const extraerValores = (arr) => {
-                    return arr.map(elemento => {
-                        if (Array.isArray(elemento)) {
-                            // Si el elemento es un array, hacer la llamada recursiva
-                            return extraerValores(elemento);
-                        } else if (elemento && elemento.hasOwnProperty('valor')) {
-                            // Si es un objeto con la propiedad 'valor', extraer solo el valor
-                            return elemento.valor;
-                        }
-                        return elemento;  // En caso de no ser un objeto esperado
-                    });
-                };
-
-                // Usar la función para obtener solo los valores numéricos
-                const valoresExtraidos = extraerValores(valor.valor);
-
-                // Convertir a string solo los valores extraídos
-                resultado += JSON.stringify(valoresExtraidos);
-            } else {
-                // Para otros tipos de valores (no arrays), concatenar directamente
-                resultado += valor.valor;
-            }
+            // Para otros tipos de valores (no arrays), concatenar directamente
+            resultado += valor.valor;
         }
 
         // Solo agregar un espacio si no es el último valor
@@ -435,7 +430,7 @@ visitPrint(node) {
      * @type {BaseVisitor['visitAsignacion']}
      */
     visitAsignacion(node) {
-        const valor = node.asgn.accept(this);
+        let valor = node.asgn.accept(this);
 
         const asignacion = new AsigVariables(node.id, valor);
         const autorizacion = asignacion.asignar(this.entornoActual);
@@ -443,6 +438,8 @@ visitPrint(node) {
         if (!autorizacion){
             //throw new Error(`No se pueden asignar tipos de datos diferentes a la variable ${node.id}\nLínea: ${node.location.start.line}, columna: ${node.location.start.column}\n`);
             registrarError("Semantico",`No se pueden asignar tipos de datos diferentes a la variable ${node.id}`, node.location.start.line, node.location.start.column);
+            valor = {tipo: 'Error', valor: null};
+            this.entornoActual.assignVariable(node.id, valor, node.location.start.line, node.location.start.column);
             return {tipo: 'Error', valor: null};
         }
         this.entornoActual.assignVariable(node.id, valor, node.location.start.line, node.location.start.column);

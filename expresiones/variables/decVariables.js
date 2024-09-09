@@ -38,21 +38,19 @@ export class DecVariables {
         if(this.tipo != null && this.exp.valor == null){
 
             if(this.tipo ==='int'){
-                var expresion = Number.parseInt(0);
-                this.exp = {tipo: this.tipo, valor: expresion};
+                return {tipo: this.tipo, valor: null};
             }
             else if(this.tipo === 'float'){
-                var expresion = Number.parseFloat(0.0);
-                this.exp = {tipo: this.tipo, valor: expresion};
+                return {tipo: this.tipo, valor: null};
             }
             else if(this.tipo === 'string'){
-                this.exp = {tipo: this.tipo, valor: ""};
+                return {tipo: this.tipo, valor: null};
             }
             else if(this.tipo === 'boolean'){
-                this.exp = {tipo: this.tipo, valor: true};
+                return {tipo: this.tipo, valor: null};
             }
             else if(this.tipo === 'char'){
-                this.exp = {tipo: this.tipo, valor: ''};
+                return {tipo: this.tipo, valor: null};
             }
             else{
                 registrarError("Semantico", "Tipo de dato no soportado", node.location.start.line, node.location.start.column);

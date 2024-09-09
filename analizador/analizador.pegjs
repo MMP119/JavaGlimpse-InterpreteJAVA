@@ -29,7 +29,8 @@
         "declaracionMatriz": nodos.DeclaracionMatriz,
         "matrizFunc": nodos.MatrizFunc,
         'dclFunc': nodos.FuncDcl,
-        'typeof': nodos.typEof
+        'typeof': nodos.typEof,
+        'dclStruct': nodos.StructDcl,
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -45,7 +46,15 @@ programa = _ dcl:Declaracion* _ { return dcl }
 
 Declaracion = dcl:DecVariable _ { return dcl }
             / dcl:DecFuncion _ { return dcl }
+            / dcl:StructDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }
+
+
+// para structs 
+StructDcl = "struct" _ id:Identificador _ "{" _ dcls:ClassStruct*  _ "}" _ ";" {return crearNodo('dclStruct', {id, dcls})}
+
+ClassStruct = dcl:DecVariable _ { return dcl }
+            /id:Identificador _ id2:Identificador _ ";" { return [id, id2] }
 
 
 //para funciones
