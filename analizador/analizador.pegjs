@@ -77,6 +77,9 @@ DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresio
 
             / tipo:TiposDatosPrimitivos _ id:Identificador _ ";" { const exp = null; return crearNodo('declaracionTipoVariable', { tipo, id, exp }) }
 
+            //para declarar struct usando por tipo el nombre del struct
+            / idStruct:Identificador _ id:Identificador _ "=" _ exp:Expresion _ ";" {return crearNodo('declaracionTipoVariable', {tipo: idStruct, id, exp})}
+
             //declaracion de arrays con inicializacion de valores
             /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ "{" _ exp:ExpresionConComa _ "}" _ ";" {const tipo2 = null; const id2 = null; return crearNodo('declaracionArreglo',{tipo, id, exp, tipo2, id2})}
 

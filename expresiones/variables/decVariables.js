@@ -64,6 +64,15 @@ export class DecVariables {
 
         if(this.tipo != null && this.exp != null){
 
+            if(this.tipo != 'int' && this.tipo != 'float' && this.tipo !=' string' && this.tipo != 'boolean' && this.tipo != 'char'){
+                if(this.exp instanceof Instancia){
+                    return {
+                        tipo: this.tipo,
+                        valor: this.exp
+                    }
+                }
+            }
+
             switch(this.tipo){
 
                 case 'int':

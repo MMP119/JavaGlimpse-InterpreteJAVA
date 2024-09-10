@@ -851,7 +851,7 @@ visitPrint(node) {
      * @type {BaseVisitor['visitInstancia']}
      */
     visitInstancia(node){
-        
+
         const struct = this.entornoActual.getVariable(node.id, node.location.start.line, node.location.start.column);
 
         //const argumentos = node.args.map(arg => arg.accept(this));
@@ -869,7 +869,7 @@ visitPrint(node) {
             return {tipo: 'Error', valor: null};
         }
 
-        return struct.valor.invocar(this, argumentos, node.id);
+        return struct.valor.invocar(this, argumentos, node);
     
     }
 

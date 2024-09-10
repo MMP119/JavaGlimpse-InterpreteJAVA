@@ -1,3 +1,4 @@
+import { registrarError } from '../../global/errores.js';
 import { Expresion } from '../../patron/nodos.js';
 import { FuncionForanea } from '../funciones/foreanea.js';
 import {Invocable} from '../funciones/invocable.js';
@@ -67,7 +68,7 @@ export class Struct extends Invocable{
     /**
      * @type {Invocable['invocar']}
      */
-    invocar(interprete, args, nombreFuncion) { 
+    invocar(interprete, args, node) { 
         const nuevaInstancia = new Instancia(this);
 
         //valores default
@@ -88,6 +89,7 @@ export class Struct extends Invocable{
             }else{
                 //throw new Error(`Propiedad no encontrada: ${id}`);
                 registrarError('Semántico', `Propiedad no encontrada: ${id}`, node.location.start.line, node.location.start.column);
+                return null;
             }
         });
 
