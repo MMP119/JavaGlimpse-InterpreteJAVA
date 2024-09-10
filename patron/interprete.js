@@ -268,19 +268,26 @@ export class InterpreterVisitor extends BaseVisitor {
             let expAccept;
             
             // Función recursiva para aceptar arreglos de cualquier dimensión
-            const aceptarArreglo = (arr) => {
+            const aceptarArreglo = (arr, tipos) => {
                 if (Array.isArray(arr)) {
                     // Si es un arreglo, aplicar recursivamente la misma función para cada elemento
-                    return arr.map(subElemento => aceptarArreglo(subElemento));
+                    return arr.map(subElemento => aceptarArreglo(subElemento, tipos));
                 } else {
+                    const valor = arr.accept(this);
+                    if(valor.tipo != tipos){
+                        registrarError("Semantico",`Los valores de la matriz deben ser de tipo ${tipos}`, node.location.start.line, node.location.start.column);
+                        return {tipo: 'Error', valor: null};
+                    }
                     // Si es un elemento base (no un arreglo), aceptar el valor
-                    return arr.accept(this);
+                    return valor;
                 }
             }
 
+            const tipoMatriz = node.tipo;
+
             // Verificar si node.exp es un arreglo de múltiples dimensiones y procesarlo recursivamente
             if (Array.isArray(node.exp)) {
-                expAccept = aceptarArreglo(node.exp);
+                expAccept = aceptarArreglo(node.exp, tipoMatriz);
             }
 
             const declararMatriz = new DecMatriz(node.tipo, idMatriz, expAccept, node.expN, node.tipo2);
