@@ -31,6 +31,9 @@
         'dclFunc': nodos.FuncDcl,
         'typeof': nodos.typEof,
         'dclStruct': nodos.StructDcl,
+        'instancia': nodos.Instancia,
+        'get': nodos.Get,
+        'set': nodos.Set,
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -50,11 +53,27 @@ Declaracion = dcl:DecVariable _ { return dcl }
             / stmt:Stmt _ { return stmt }
 
 
-// para structs 
-StructDcl = "struct" _ id:Identificador _ "{" _ dcls:ClassStruct*  _ "}" _ ";" {return crearNodo('dclStruct', {id, dcls})}
+// para declara structs
+StructDcl = "struct" _ id:Identificador _ "{" _ dcls:StructFields*  _ "}" _ ";" {return crearNodo('dclStruct', {id, dcls})}
 
-ClassStruct = dcl:DecVariable _ { return dcl }
-            /id:Identificador _ id2:Identificador _ ";" { return [id, id2] }
+StructFields = dcl:DecVariable _ { return dcl }
+            /id:Identificador _ id2:Identificador _ ";" { return {idTipoStruct: id, idVariable: id2} } //para declarar un struct dentro de otro, idTipoStruct es el nombre del struct que lo contiene y idStructAninado es el nombre del struct anidado, por ejemplo Persona propietario;
+
+// para instanciar structs
+//StructInstance = tipo:(Identificador/"var") _ id:Identificador _ "=" _ idStruct:Identificador _ "{" _ dcls:FieldsAssigments*  _ "}"  { }
+
+//FieldsAssigments = FieldAssignment ("," _ FieldAssignment)* {}
+
+//FieldAssignment = id:Identificador _ ":" _ exp:Expresion {}
+
+//Acceso a propiedades de un struct
+//StructAccess = idStruct:Identificador _ "." _ idPropiedad:Identificador {}
+
+//asignacion de valores a las propiedades de un struct
+//StructAssignment = idStruct:Identificador _ "." _ idPropiedad:Identificador _ "=" _ exp:Expresion {}
+
+
+
 
 
 //para funciones
@@ -156,15 +175,30 @@ DefaultClause = "default" _ ":" _ stmt:(_ st:Stmt _{return st})*{return { stmt }
 Expresion = Asignacion
 
 
-Asignacion = id:Identificador _ "=" _ asgn:Asignacion { return crearNodo('asignacion', { id, asgn }) }
+Asignacion = asignado:LlamadaFuncion _ "=" _ asgn:Asignacion 
+    
+    {   
 
-            / OperadorAsignacion
+        if(asignado instanceof nodos.ReferenciaVariable){
+            return crearNodo('asignacion', { id: asignado.id, asgn })
+        }
 
-            / Ternario
 
-            / "typeof" _  exp:Expresion _ { return crearNodo('typeof', { exp }) }
-            
-            / Or
+        if(!(asignado instanceof nodos.Get)){
+            throw new Error('Solo se pueden asignar valores a propiedades de objetos')
+        }
+
+        return crearNodo('set', {objetivo: asignado.objetivo, propiedad: asignado.propiedad, valor: asgn})
+    
+    }
+
+    / OperadorAsignacion
+
+    / Ternario
+
+    / "typeof" _  exp:Expresion _ { return crearNodo('typeof', { exp }) }
+    
+    / Or
 
 
 OperadorAsignacion = id: Identificador _ expansion:( _ op:("+=" / "-=") _  der:Relacionales { return { tipo: op, der } }) 
@@ -259,13 +293,25 @@ Unaria = "-" _ num:Unaria { return crearNodo('unaria', { op: '-', exp: num }) }
     / LlamadaFuncion
 
 
-LlamadaFuncion = callee:Datos _ params:("(" args: Argumentos? ")"{return args})*{
-    return params.reduce(
-        (callee, args) => {
-        return crearNodo('llamada', { callee, args: args || [] })
+LlamadaFuncion = objetivoInicial:Datos _ operaciones:(
+        ("(" _ args: Argumentos? _ ")"{return {args, tipo:'llamadaFuncion'}})
+        / ("." _ id:Identificador _ {return {id, tipo:'get'}})
+    )*{
+    const op = operaciones.reduce(
+        (objetivo, args) => {
+        //return crearNodo('llamada', { callee, args: args || [] })
+
+        const {tipo, id, args:argumentos} = args;
+
+        if(tipo === 'llamadaFuncion'){
+            return crearNodo('llamada', { callee:objetivo, args: argumentos || [] })
+        }else if(tipo === 'get'){
+            return crearNodo('get', {objetivo, propiedad:id})
+        }
         },
-        callee
+        objetivoInicial
     )
+    return op;
 }
 
 Argumentos = arg: Expresion _ args:("," _ exp: Expresion {return exp})* {return [arg, ...args]} //para los argumentos de las funciones
@@ -284,6 +330,8 @@ Datos =  "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
     / Booleano
 
     / ArrayFunc
+
+    /"new" _ id:Identificador _ "(" _ args:Argumentos? ")" {return crearNodo('instancia', {id, args: args || []})} 
 
     / id:Identificador { return crearNodo('referenciaVariable', { id }) }
 
@@ -340,7 +388,7 @@ EscapeSequence = "\\" esc:(["\\nrt"]) {
 }
 
 
-TiposDatosPrimitivos = "int" / "float" / "string" / "boolean" / "char" / "var"  { return text() }
+TiposDatosPrimitivos = "int" / "float" / "string" / "boolean" / "char" / "var" / 'struct' { return text() }
 
 
 // Ignorar espacios en blanco y comentarios, tanto de una línea como multilínea

@@ -1,4 +1,5 @@
 import {registrarError} from '../../global/errores.js';
+import { Instancia } from '../structs/instancia.js';
 
 export class DecVariables {
 
@@ -31,7 +32,7 @@ export class DecVariables {
 
         //primero verificar si la variable viene con un tipo de dato y sin valor
         // por ejemplo int a;
-        if(this.tipo != null && this.exp.valor == null){
+        if(this.tipo != null && this.exp.valor === null){
 
             if(this.tipo ==='int'){
                 return {tipo: this.tipo, valor: null};
@@ -147,6 +148,13 @@ export class DecVariables {
 
                 // si viene con var, entonces se debe detectar el tipo de dato
                 case 'var':
+
+                    if(this.exp instanceof Instancia){
+                        return {
+                            tipo: this.tipo,
+                            valor: this.exp
+                        }
+                    }
 
                     switch(this.exp.tipo){
 

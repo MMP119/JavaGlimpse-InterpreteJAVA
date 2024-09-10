@@ -16,6 +16,8 @@ import {ArrayFunc} from '../expresiones/arrays/arrayFunc.js';
 import { DecMatriz } from '../expresiones/matrices/decMatriz.js';
 import { MatrizFunc } from '../expresiones/matrices/matrizFunc.js';
 import { FuncionForanea } from '../expresiones/funciones/foreanea.js';
+import { Struct } from '../expresiones/structs/structs.js';
+import { Instancia } from '../expresiones/structs/instancia.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -395,30 +397,33 @@ visitPrint(node) {
     node.exp.forEach((exp, index) => {
         const valor = exp.accept(this);
 
-        // Verificar si el valor es una matriz o array
-        if (Array.isArray(valor.valor)) {
-            // Crear una función recursiva para extraer solo los valores numéricos
-            const extraerValores = (arr) => {
-                return arr.map(elemento => {
-                    if (Array.isArray(elemento)) {
-                        // Si el elemento es un array, hacer la llamada recursiva
-                        return extraerValores(elemento);
-                    } else if (elemento && elemento.hasOwnProperty('valor')) {
-                        // Si es un objeto con la propiedad 'valor', extraer solo el valor
-                        return elemento.valor;
-                    }
-                    return elemento;  // En caso de no ser un objeto esperado
-                });
-            };
+        if(valor !==null){
+            if (Array.isArray(valor.valor)) {// Verificar si el valor es una matriz o array
+                // función recursiva para extraer solo los valores numéricos
+                const extraerValores = (arr) => {
+                    return arr.map(elemento => {
+                        if (Array.isArray(elemento)) {
+                            // Si el elemento es un array, hacer la llamada recursiva
+                            return extraerValores(elemento);
+                        } else if (elemento && elemento.hasOwnProperty('valor')) {
+                            // Si es un objeto con la propiedad 'valor', extraer solo el valor
+                            return elemento.valor;
+                        }
+                        return elemento;  // En caso de no ser un objeto esperado
+                    });
+                };
 
-            // Usar la función para obtener solo los valores numéricos
-            const valoresExtraidos = extraerValores(valor.valor);
+                // Usar la función para obtener solo los valores numéricos
+                const valoresExtraidos = extraerValores(valor.valor);
 
-            // Convertir a string solo los valores extraídos
-            resultado += JSON.stringify(valoresExtraidos);
-        } else {
-            // Para otros tipos de valores (no arrays), concatenar directamente
-            resultado += valor.valor;
+                // Convertir a string solo los valores extraídos
+                resultado += JSON.stringify(valoresExtraidos);
+            } else {
+                // Para otros tipos de valores (no arrays), concatenar directamente
+                resultado += valor.valor;
+            }
+        }else{
+            resultado += valor;
         }
 
         // Solo agregar un espacio si no es el último valor
@@ -779,6 +784,10 @@ visitPrint(node) {
         this.entornoActual.setFuncion(node.id, {tipo: node.tipo, valor: funcion}, node.location.start.line, node.location.start.column);
     }
 
+
+    /**
+     * @type {BaseVisitor['visittypEof']}
+     */
     visittypEof(node){
         const argumento = node.exp.accept(this);
         if(argumento.tipo === 'Error' || argumento === null){
@@ -803,8 +812,85 @@ visitPrint(node) {
         }
     }
 
+
+
+    /**
+     * @type {BaseVisitor['visitStructDcl']}
+     */
     visitStructDcl(node){
-        
+        const metodos = {};
+        const propiedades = {};
+
+        node.dcls.forEach(dcl => {
+            if(dcl instanceof nodos.FuncDcl){
+                metodos[dcl.id] = new FuncionForanea(dcl, this.entornoActual);
+            }else if(dcl instanceof nodos.DeclaracionTipoVariable){
+                propiedades[dcl.id] = dcl.exp;
+            }
+        });
+
+        const struct = new Struct(node.id, propiedades, metodos);
+        this.entornoActual.setVariable(node.id, {tipo: 'struct', valor: struct}, node.location.start.line, node.location.start.column);
+
     }
+
+
+    /**
+     * @type {BaseVisitor['visitInstancia']}
+     */
+    visitInstancia(node){
+        const struct = this.entornoActual.getVariable(node.id, node.location.start.line, node.location.start.column);
+
+        const argumentos = node.args.map(arg => arg.accept(this));
+
+        if(!(struct.valor instanceof Struct)){
+            registrarError("Semantico", `El ID '${node.id}' no es un struct`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        }
+
+        return struct.valor.invocar(this, argumentos, node.id);
+    
+    }
+
+    
+
+    /**
+    * @type {BaseVisitor['visitGet']}
+    */
+    visitGet(node) {
+
+        const instancia = node.objetivo.accept(this);
+
+        if (!(instancia.valor instanceof Instancia)) {
+            registrarError('Semántico', 'No es posible obtener una propiedad de algo que no es una instancia', node.location.start.line, node.location.start.column);
+            return { tipo: 'Error', valor: null };
+        }
+
+        return instancia.valor.get(node.propiedad);
+    }
+
+
+    
+    /**
+    * @type {BaseVisitor['visitSet']}
+    */
+    visitSet(node) {
+
+        const instancia = node.objetivo.accept(this);
+
+        if (!(instancia.valor instanceof Instancia)) {
+            //throw new Error('No es posible asignar una propiedad de algo que no es una instancia');
+            registrarError('Semántico', 'No es posible asignar una propiedad de algo que no es una instancia', node.location.start.line, node.location.start.column);
+            return { tipo: 'Error', valor: null };
+        }
+
+        const valor = node.valor.accept(this);
+
+        instancia.valor.set(node.propiedad, valor);
+
+        return valor;
+    }
+
+
 
 }
