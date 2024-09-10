@@ -102,7 +102,7 @@ export class FuncionForanea extends Invocable{
 
     atar(instancia) {
         const entornoOculto = new Entorno("this", this.clousure);
-        entornoOculto.setVariable('this', instancia);
+        entornoOculto.setVariable('this', instancia, "", "");
         return new FuncionForanea(this.nodo, entornoOculto);
     }
 

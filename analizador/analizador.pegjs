@@ -59,20 +59,6 @@ StructDcl = "struct" _ id:Identificador _ "{" _ dcls:StructFields*  _ "}" _ ";" 
 StructFields = dcl:DecVariable _ { return dcl }
             /id:Identificador _ id2:Identificador _ ";" { return {idTipoStruct: id, idVariable: id2} } //para declarar un struct dentro de otro, idTipoStruct es el nombre del struct que lo contiene y idStructAninado es el nombre del struct anidado, por ejemplo Persona propietario;
 
-// para instanciar structs
-//StructInstance = tipo:(Identificador/"var") _ id:Identificador _ "=" _ idStruct:Identificador _ "{" _ dcls:FieldsAssigments*  _ "}"  { }
-
-//FieldsAssigments = FieldAssignment ("," _ FieldAssignment)* {}
-
-//FieldAssignment = id:Identificador _ ":" _ exp:Expresion {}
-
-//Acceso a propiedades de un struct
-//StructAccess = idStruct:Identificador _ "." _ idPropiedad:Identificador {}
-
-//asignacion de valores a las propiedades de un struct
-//StructAssignment = idStruct:Identificador _ "." _ idPropiedad:Identificador _ "=" _ exp:Expresion {}
-
-
 
 
 
@@ -331,10 +317,16 @@ Datos =  "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
 
     / ArrayFunc
 
-    /"new" _ id:Identificador _ "(" _ args:Argumentos? ")" {return crearNodo('instancia', {id, args: args || []})} 
+    / id:Identificador _ "{" _ args:StructInstancia? _ "}" {return crearNodo('instancia', {id, args: args || []})} 
 
     / id:Identificador { return crearNodo('referenciaVariable', { id }) }
 
+
+StructInstancia = primero:(id:Identificador _ ":" _ exp:Expresion {return {id, exp}}) resto:(_ "," _ id:Identificador _ ":" _ exp:Expresion {return {id, exp}})* 
+    {
+        return [{id: primero.id, exp: primero.exp}, ...resto.map(({id, exp}) => ({id, exp}))];
+
+    }
 
 ArrayFunc = id:Identificador _ "." _ method:("indexOf"/"join"/"length") _ exp:("(" _  exp:Expresion? _ ")" {return exp})? {return crearNodo('arrayFunc', { id, method, exp })} 
     

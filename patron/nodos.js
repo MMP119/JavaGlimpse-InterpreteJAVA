@@ -1078,12 +1078,20 @@ export class Instancia extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {string} options.id identificador de la instancia
+    * @param {string} options.tipo Tipo de la instancia del struct
+ * @param {string} options.id identificador de la instancia
  * @param {Expresion[]} options.args Argumentos de la instancia
     */
-    constructor({ id, args }) {
+    constructor({ tipo, id, args }) {
         super();
         
+        /**
+         * Tipo de la instancia del struct
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
         /**
          * identificador de la instancia
          * @type {string}

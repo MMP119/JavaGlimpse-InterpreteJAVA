@@ -90,4 +90,10 @@ export class Entorno {
         registrarError("Semantico",`Variable ${nombre} no definida`, fila, columna);
         return{tipo: 'Error', valor: null};
     }
+
+
+    obtenerNombreEntorno(){
+        return this.nombreEntorno;
+    }
+
 }

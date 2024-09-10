@@ -1,3 +1,4 @@
+import { registrarError } from "../../global/errores.js";
 import { Struct } from "./structs.js";
 
 
@@ -16,7 +17,7 @@ export class Instancia {
         this.propiedades[nombre] = valor;
     }
 
-    get(nombre) {
+    get(nombre, node) {
         if (this.propiedades.hasOwnProperty(nombre)) {
             return this.propiedades[nombre];
         }
@@ -26,7 +27,10 @@ export class Instancia {
             return metodo.atar(this);
         }
 
-        throw new Error(`Propiedad no encontrada: ${nombre}`);
+        //throw new Error(`Propiedad no encontrada: ${nombre}`);
+        registrarError('Semántico', `Propiedad no encontrada: ${nombre}`, node.location.start.line, node.location.start.column);
+        return null;
+
     }
 
 }

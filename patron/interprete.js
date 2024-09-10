@@ -829,7 +829,19 @@ visitPrint(node) {
             }
         });
 
+        //verificar si es el entorno global, si es el entorno global se puede declarar el struct si no, no se puede declarar
+        if(this.entornoActual.obtenerNombreEntorno() !== 'Global'){
+            registrarError("Semantico", `No se puede declarar un struct en un bloque diferente al entorno global`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        }
+
         const struct = new Struct(node.id, propiedades, metodos);
+
+        if(struct.verificarReservada(node, node.id)){
+            registrarError("Semantico", `El ID '${node.id}' del struct es una palabra reservada`, node.location.start.line, node.location.start.column);
+            return {tipo: 'Error', valor: null};
+        }
+
         this.entornoActual.setVariable(node.id, {tipo: 'struct', valor: struct}, node.location.start.line, node.location.start.column);
 
     }
@@ -839,9 +851,18 @@ visitPrint(node) {
      * @type {BaseVisitor['visitInstancia']}
      */
     visitInstancia(node){
+        
         const struct = this.entornoActual.getVariable(node.id, node.location.start.line, node.location.start.column);
 
-        const argumentos = node.args.map(arg => arg.accept(this));
+        //const argumentos = node.args.map(arg => arg.accept(this));
+
+        //los node.args vienene así: (3) [{…}, {…}, {…}] donde es 0: {id: 'nombre', exp: Cadena} 1: {id: 'edad', exp: Numero} 2: {id: 'estatura', exp: Numero} por ejemplo
+        // Procesa los argumentos como { id, exp } y acepta el valor de 'exp'
+        const argumentos = node.args.map(arg => {
+            const valor = arg.exp.accept(this);  // Acepta la expresión
+            return { id: arg.id, valor };  // Retorna un objeto con el id y el valor evaluado
+        });
+        
 
         if(!(struct.valor instanceof Struct)){
             registrarError("Semantico", `El ID '${node.id}' no es un struct`, node.location.start.line, node.location.start.column);
@@ -858,15 +879,13 @@ visitPrint(node) {
     * @type {BaseVisitor['visitGet']}
     */
     visitGet(node) {
-
         const instancia = node.objetivo.accept(this);
 
         if (!(instancia.valor instanceof Instancia)) {
             registrarError('Semántico', 'No es posible obtener una propiedad de algo que no es una instancia', node.location.start.line, node.location.start.column);
             return { tipo: 'Error', valor: null };
         }
-
-        return instancia.valor.get(node.propiedad);
+        return instancia.valor.get(node.propiedad, node);
     }
 
 
