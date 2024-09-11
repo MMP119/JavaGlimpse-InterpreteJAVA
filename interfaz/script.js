@@ -20,15 +20,6 @@ var consoleEditor = CodeMirror.fromTextArea(document.getElementById('consoleOutp
     viewportMargin: Infinity,
 });
 
-//garbage collector
-const content = localStorage.getItem('content')
-editor.setValue(content || "")
-
-// save content in local storage
-editor.on('change', (editor) => {
-    const content = editor.getValue()
-    localStorage.setItem('content', content)
-})
 
 //funcion para el boton 'open', abre un archivo
 document.getElementById('openButton').addEventListener('click', function() {
