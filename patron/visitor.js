@@ -99,6 +99,9 @@
 
  * @typedef {import('./nodos').Set} Set
 
+
+ * @typedef {import('./nodos').ObjKey} ObjKey
+
  */
 
 
@@ -403,6 +406,15 @@ export class BaseVisitor {
      */
     visitSet(node) {
         throw new Error('Metodo visitSet no implementado');
+    }
+    
+
+    /**
+     * @param {ObjKey} node
+     * @returns {any}
+     */
+    visitObjKey(node) {
+        throw new Error('Metodo visitObjKey no implementado');
     }
     
 }

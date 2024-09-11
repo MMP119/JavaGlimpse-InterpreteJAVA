@@ -34,6 +34,7 @@
         'instancia': nodos.Instancia,
         'get': nodos.Get,
         'set': nodos.Set,
+        'ObjKey': nodos.ObjKey
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -186,6 +187,8 @@ Asignacion = asignado:LlamadaFuncion _ "=" _ asgn:Asignacion
     / Ternario
 
     / "typeof" _  exp:Expresion _ { return crearNodo('typeof', { exp }) }
+
+    / "Object.keys" _ "(" _ exp:Datos _ ")" { return crearNodo('ObjKey', { exp }) }
     
     / Or
 
@@ -319,13 +322,13 @@ Datos =  "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
     / Booleano
 
     / ArrayFunc
-                                            //esto es para los structs
+                                            //esto es para los structs, las intancias
     / id:Identificador _ "{" _ args:StructInstancia? _ "}" {return crearNodo('instancia', {id, args: args || []})} 
 
     / id:Identificador { return crearNodo('referenciaVariable', { id }) }
 
 
-                                        //para las instancias de los structs
+                                        //para los atributos de los structs
 StructInstancia = primero:(id:Identificador _ ":" _ exp:(exp:Expresion{return exp} / dato:Datos {return datos}) {return {id, exp}}) resto:(_ "," _ id:Identificador _ ":" _ exp:(exp:Expresion{return exp} / dato:Datos {return datos}) {return {id, exp}})* 
     {
         return [{id: primero.id, exp: primero.exp}, ...resto.map(({id, exp}) => ({id, exp}))];

@@ -18,6 +18,7 @@ import { MatrizFunc } from '../expresiones/matrices/matrizFunc.js';
 import { FuncionForanea } from '../expresiones/funciones/foreanea.js';
 import { Struct } from '../expresiones/structs/structs.js';
 import { Instancia } from '../expresiones/structs/instancia.js';
+import { agregarSimbolo } from '../global/simbolos.js';
 
 export class InterpreterVisitor extends BaseVisitor {
 
@@ -801,6 +802,15 @@ visitPrint(node) {
             registrarError("Semantico", `No se puede determinar el tipo de '${node.exp}'`, node.location.start.line, node.location.start.column);
             return { tipo: 'Error', valor: null };
         }
+
+        if(argumento instanceof Instancia){
+            return {tipo: 'string', valor: argumento.clase.nombre};
+        }
+
+        if(argumento.tipo != 'int' && argumento.tipo != 'float' && argumento.tipo != 'string' && argumento.tipo != 'boolean' && argumento.tipo != 'char' && argumento.tipo != 'struct' && (!(argumento instanceof Instancia ))){
+            return {tipo: 'string', valor: argumento.tipo};
+        }
+
         // Devolver el tipo como string
         switch (argumento.tipo) {
             case 'int':
@@ -813,6 +823,8 @@ visitPrint(node) {
                 return { tipo: 'string', valor: 'boolean' };
             case 'char':
                 return { tipo: 'string', valor: 'char' };
+            case 'struct':
+                return { tipo: 'string', valor: 'struct' };
             default:
                 registrarError("Semantico", `Tipo de dato no soportado para typeof`, node.location.start.line, node.location.start.column);
                 return { tipo: 'Error', valor: null };
@@ -925,6 +937,26 @@ visitPrint(node) {
         return valor;
     }
 
+
+
+    /**
+    * @type {BaseVisitor['visitObjKey']}
+    */  
+    visitObjKey(node){
+        
+        const instancia = node.exp.accept(this);
+
+        if (!(instancia.valor instanceof Instancia)) {
+            registrarError('Semántico', 'No es posible obtener las propiedades de algo que no es una instancia', node.location.start.line, node.location.start.column);
+            return { tipo: 'Error', valor: null };
+        }
+
+        //obtener las propiedades del struct y retornarlas como un arreglo
+        const propiedades = instancia.valor.propiedades;
+        const keys = Object.keys(propiedades);
+        return {tipo: 'string', valor: keys};
+
+    }
 
 
 }
