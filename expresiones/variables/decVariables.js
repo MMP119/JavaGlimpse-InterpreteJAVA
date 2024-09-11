@@ -49,6 +49,9 @@ export class DecVariables {
             else if(this.tipo === 'char'){
                 return {tipo: this.tipo, valor: null};
             }
+            else if(this.tipo === 'struct'){
+                return {tipo: this.tipo, valor: null};
+            }
             else{
                 registrarError("Semantico", "Tipo de dato no soportado", node.location.start.line, node.location.start.column);
                 return {

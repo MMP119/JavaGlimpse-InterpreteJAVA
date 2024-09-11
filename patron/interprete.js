@@ -888,6 +888,14 @@ visitPrint(node) {
     visitGet(node) {
         const instancia = node.objetivo.accept(this);
 
+        if(instancia.valor === undefined){
+            if(!(instancia instanceof Instancia)){
+                registrarError('Semántico', 'No es posible obtener una propiedad de algo que no es una instancia', node.location.start.line, node.location.start.column);
+                return { tipo: 'Error', valor: null };
+            }
+            return instancia.get(node.propiedad, node);
+        }
+
         if (!(instancia.valor instanceof Instancia)) {
             registrarError('Semántico', 'No es posible obtener una propiedad de algo que no es una instancia', node.location.start.line, node.location.start.column);
             return { tipo: 'Error', valor: null };
