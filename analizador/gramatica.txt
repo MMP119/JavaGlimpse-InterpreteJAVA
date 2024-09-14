@@ -1,0 +1,153 @@
+programa = _ dcl:Declaracion* _ 
+
+Declaracion = dcl:DecVariable _ 
+            / dcl:DecFuncion _ 
+            / dcl:StructDcl _ 
+            / stmt:Stmt _ 
+
+StructDcl = "struct" _ id:Identificador _ "{" _ dcls:StructFields*  _ "}" _ ";"
+
+StructFields = dcl:DecVariable _ 
+            /id:Identificador _ id2:Identificador _ ";" 
+
+DecFuncion = tipo:(TiposDatosPrimitivos /"void")  _ id:Identificador _ "(" _ params:Parametros? _ ")" _ bloque:Bloque
+
+Parametros = primerParam:Parametro _ params:("," _ param:Parametro )* 
+
+Parametro = tipo:( tip:TiposDatosPrimitivos ConArreglo / TiposDatosPrimitivos) _ id:Identificador
+
+ConArreglo = _ ("[" _ "]")+
+
+DecVariable = tipo:TiposDatosPrimitivos _ id:Identificador _  "=" _ exp:Expresion _ ";"
+            / tipo:TiposDatosPrimitivos _ id:Identificador _ ";" 
+            / idStruct:Identificador _ id:Identificador _ "=" _ exp:Expresion _ ";"
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ "{" _ exp:ExpresionConComa _ "}" _ ";" 
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ "new" _  tipo2:TiposDatosPrimitivos _ "[" _ exp:Expresion _ "]" _ ";"
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ id:Identificador _ "=" _ id2:Expresion _ ";"       
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ ("[" _ "]")+ _ id:Identificador _ "=" _ exp:MatrizValores _ ";"
+            /tipo:TiposDatosPrimitivos _ "[" _ "]" _ ("[" _ "]")+ _ id:Identificador _ "=" _ "new" _ tipo2:TiposDatosPrimitivos _ "[" _ exp:Expresion _ "]" _ expN:("[" _ expN1:Expresion _ "]")+ _ ";" 
+
+MatrizValores = _ "{" _ elementos:ElementosAnidados _ "}"
+
+ElementosAnidados = primer:MatrizElemento _ siguiente:("," _ siguienteElem:MatrizElemento)*
+
+MatrizElemento = "{" _ valores:ElementosAnidados _ "}" 
+        / valor: Expresion 
+
+ExpresionConComa = exp:Expresion _ coma:("," _ exp2:Expresion)* 
+
+Stmt = "System.out.println(" _ exp:ExpresionConComa _ ")" _ ";" 
+    / Bloque:Bloque 
+    / "if" _ "(" _ cond:Expresion _ ")" _ stmtTrue:Stmt stmtFalse:( _ "else" _ stmtFalse:Stmt )?
+    / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt 
+    / "for" _ "(" _ init: ForInit _ cond:Expresion _ ";" _ inc:Expresion _ ")" _ stmt: Stmt 
+    / "for" _ "(" _  tipo:TiposDatosPrimitivos _ id:Identificador _ ":" _ id2:Expresion _ ")" _ stmt: Stmt 
+    / "break" _ ";" 
+    / "continue" _ ";" 
+    / "return" _ exp:Expresion? _ ";" 
+    / SwitchStmt 
+    / exp:Expresion _ ";"
+
+Bloque = "{" _ dcls:Declaracion* _ "}" 
+
+ForInit = dcl:Declaracion 
+        / exp:Expresion _ ";"
+        / ";" 
+
+SwitchStmt = "switch" _ "(" _ exp:Expresion _ ")" _ "{" _ cases: CaseClause* _ defaultClause: DefaultClause? _ "}"
+
+CaseClause = _ "case" _ exp:Expresion _ ":" _ stmt:( _ st:Stmt _ )*
+
+DefaultClause = "default" _ ":" _ stmt:(_ st:Stmt _)*
+
+Expresion = Asignacion
+
+Asignacion = asignado:LlamadaFuncion _ "=" _ asgn:Asignacion 
+    / OperadorAsignacion
+    / Ternario
+    / "typeof" _  exp:Expresion _ 
+    / "Object.keys" _ "(" _ exp:Datos _ ")" 
+    / Or
+
+OperadorAsignacion = id: Identificador _ expansion:( _ op:("+=" / "-=") _  der:Relacionales) 
+
+Ternario = cond:Comparacion _ "?" _ expTrue:Expresion _ ":" _ expFalse:Expresion 
+
+Or = izq:And expansion:(_ "||" _ der:And )* 
+
+And = izq:Comparacion expansion:(_ "&&" _ der:Comparacion )* 
+
+Comparacion = izq:Relacionales expansion:(_ op:("==" / "!=") _ der:Relacionales)* 
+
+Relacionales = izq:Suma expansion:(_ op:("<="/ "<" / ">=" / ">") _ der:Suma)* 
+
+Suma = izq:Multiplicacion expansion:( _ op:("+" / "-") _ der:Multiplicacion)* 
+
+Multiplicacion = izq:Unaria expansion:(_ op:("*" / "/" / "%") _ der:Unaria)* 
+
+Unaria = "-" _ num:Unaria 
+    / "!" _ num:Unaria 
+    / LlamadaFuncion
+
+LlamadaFuncion = objetivoInicial:Datos _ operaciones:(
+        ("(" _ args: Argumentos? _ ")"{return {args, tipo:'llamadaFuncion'}})
+        / ("." _ id:Identificador _ {return {id, tipo:'get'}})
+    )*
+
+Argumentos = arg: Expresion _ args:("," _ exp: Expresion )* 
+
+Datos =  "(" _ exp:Expresion _ ")" 
+    / "[" _ exp:Expresion _ "]" 
+    /NumeroDecimal
+    / NumeroEntero
+    / Cadena
+    / Booleano
+    / ArrayFunc
+    / id:Identificador _ "{" _ args:StructInstancia? _ "}" 
+    / id:Identificador 
+
+StructInstancia = primero:(id:Identificador _ ":" _ exp:(exp:Expresion / dato:Datos ) ) resto:(_ "," _ id:Identificador _ ":" _ exp:(exp:Expresion / dato:Datos ))* 
+
+ArrayFunc = id:Identificador _ "." _ method:("indexOf"/"join"/"length") _ exp:("(" _  exp:Expresion? _ ")" ) 
+    
+    / id:Identificador _ "[" _ index:Expresion _ "]" _ "=" _ value:Expresion 
+    
+    / id:Identificador _ "[" _ index: Expresion "]" _  indices:("[" _ index1: Expresion _ "]")+ _ "=" _ value:Expresion
+    
+    / id:Identificador _ "[" _ index: Expresion "]" _  indices:("[" _ index1: Expresion _ "]")+ 
+
+    / id:Identificador _ "[" _ index:Expresion _ "]"                        
+
+NumeroEntero = [0-9]+//( "." [0-9]+ )? 
+
+NumeroDecimal = [0-9]+("." [0-9]+)
+
+Cadena = "\"" chars: Caracteres* "\"" 
+        / Caracter 
+
+Caracter = "\'" chars: Caracteres "\'"
+
+Caracteres = EscapeSequence 
+    / [^\\"]
+
+EscapeSequence = "\\" esc:(["\\nrt"]) { 
+    switch (esc) {
+        case 'n': return '\n';
+        case 't': return '\t';
+        case 'r': return '\r';
+        case '\\': return '\\';
+        case '"': return '"';
+    }
+}
+
+TiposDatosPrimitivos = "int" / "float" / "string" / "boolean" / "char" / "var" / 'struct' 
+
+_ = ([ \t\n\r] / Comentarios)*
+
+Comentarios = "//" (![\n] .)* 
+            / "/*"(!( "*/") .)* "*/"
+
+Identificador = [a-zA-Z_][a-zA-Z0-9_]* 
+
+Booleano = "true" 
+        / "false" 
