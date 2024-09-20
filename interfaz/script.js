@@ -1,7 +1,7 @@
-import { parse } from '../analizador/analizador.js';
-import { InterpreterVisitor} from '../patron/interprete.js';
-import { obtenerErrores, limpiarErrores, obtenerErroresHTML } from '../global/errores.js';
-import { obtenerSimbolos, limpiarSimbolos, obtenerSimbolosHTML } from '../global/simbolos.js';
+import { parse } from '../interprete/analizador/analizador.js';
+import { InterpreterVisitor} from '../interprete/patron/interprete.js';
+import { obtenerErrores, limpiarErrores, obtenerErroresHTML, registrarError } from '../interprete/global/errores.js';
+import { obtenerSimbolos, limpiarSimbolos, obtenerSimbolosHTML } from '../interprete/global/simbolos.js';
 
 // Inicializa CodeMirror en el textarea con id 'codeInput'
 var editor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
@@ -76,6 +76,9 @@ document.getElementById('runButton').addEventListener('click', () => {
             consoleEditor.setValue(
                 `Error de sintaxis: ${e.message}\nLínea: ${e.location.start.line}, Columna: ${e.location.start.column}`
             );
+
+            //agrergar el error a la lista de errores
+            registrarError('Sintáctico', e.message, e.location.start.line, e.location.start.column);
         } else {
             // Manejar otros posibles errores
             const errorMessage = e.location 
