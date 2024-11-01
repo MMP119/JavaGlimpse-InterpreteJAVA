@@ -5,3 +5,4 @@
 - [Gramática](./analizador/gramatica.txt)
 - [Manual de Usuario](./Manuales/De%20Usuario.md)
 - [Manual Técnico](./Manuales/Técnico.md)
+- [Licencia](./LICENSE.md)
