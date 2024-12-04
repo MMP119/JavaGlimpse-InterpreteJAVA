@@ -48,7 +48,7 @@ La consola muestra la salida del código que se está ejecutando, incluyendo:
 - **Reportes**: Genera un reporte de símbolos y errores detectados.
 
 <p align="center">
-    <img src="imgs/interfaz1.png" width="1500px">
+    <img src="./Manuales/imgs/interfaz1.png" width="1500px">
     <br>
     <text> Distibución de los botones dentro de la aplicación </text>
 </p>
@@ -63,7 +63,7 @@ La consola muestra la salida del código que se está ejecutando, incluyendo:
 3. **Revisa la Consola**: Los resultados aparecerán en la consola, junto con los errores o la salida generada.
 
 <p align="center">
-    <img src="imgs/interfaz.png" width="1500px">
+    <img src="./Manuales/imgs/interfaz.png" width="1500px">
     <br>
     <text> Ejemplo del funcionamiento </text>
 </p>
@@ -72,23 +72,23 @@ La consola muestra la salida del código que se está ejecutando, incluyendo:
 
 ## ⚡ **Funciones Destacadas**
 
-1. **Interpretación en Tiempo Real**: Escribe código y ejecútalo en tiempo real, sin necesidad de descarga alguna, presiona el siguiente enlace: <p><a href="https://mmp119.github.io/OLC2_Proyecto1_202110509/">https://mmp119.github.io/OLC2_Proyecto1_202110509/</a></p>
+1. **Interpretación en Tiempo Real**: Escribe código y ejecútalo en tiempo real, sin necesidad de descarga alguna, presiona el siguiente enlace: <p><a href="https://mmp119.github.io/JavaGlimpse-InterpreteJAVA/">https://mmp119.github.io/JavaGlimpse-InterpreteJAVA/</a></p>
 
 2. **Reportes Detallados**: Revisa los símbolos utilizados en tu código y los errores que aparezcan durante la ejecución.
 <p align="center">
-    <img src="imgs/reporteErrores.png" width="1500px">
+    <img src="./Manuales/imgs/reporteErrores.png" width="1500px">
     <br>
     <text> Reporte de errores </text>
 </p>
 
 <p align="center">
-    <img src="imgs/simbolos.png" width="1500px">
+    <img src="./Manuales/imgs/simbolos.png" width="1500px">
     <br>
     <text> Reporte de tabla de símbolos </text>
 </p>
 3. **Resaltado de Errores**: Los errores de sintaxis aparecen directamente en el área de código, resaltando el problema.
 <p align="center">
-    <img src="imgs/errores.png" width="1500px">
+    <img src="./Manuales/imgs/errores.png" width="1500px">
     <br>
     <text> Errores listados desde la consola </text>
 </p>
