@@ -123,4 +123,3 @@ Haz clic en el botón **Guardar Archivo** para descargar tu código como un arch
 
 ## 🔩 **Otros**
 - [Manual Técnico](./Manuales/Técnico.md)
-- [Licencia](./LICENSE.md)
