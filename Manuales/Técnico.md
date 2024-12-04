@@ -1,4 +1,4 @@
-# <p align="center"> 🏆 **OakLand  - Manual Técnico**
+# <p align="center"> 🏆 **JavaGlimpse  - Manual Técnico**
 
 ## 📖 **Índice**
 
@@ -13,7 +13,7 @@
 
 ## 🔥 **Introducción**
 
-**OakLand** es una poderosa herramienta de análisis e interpretación de código inspirado en Java, diseñada para facilitar el desarrollo y la depuración de programas. Desplegado directamente en **GitHub Pages**, permite a los usuarios acceder desde cualquier navegador sin necesidad de instalación. Este intérprete, construido con **JavaScript** y **PeggyJS**, incluye una interfaz intuitiva basada en **CodeMirror**.
+**JavaGlimpse** es una poderosa herramienta de análisis e interpretación de código inspirado en Java, diseñada para facilitar el desarrollo y la depuración de programas. Desplegado directamente en **GitHub Pages**, permite a los usuarios acceder desde cualquier navegador sin necesidad de instalación. Este intérprete, construido con **JavaScript** y **PeggyJS**, incluye una interfaz intuitiva basada en **CodeMirror**.
 
 ---
 
